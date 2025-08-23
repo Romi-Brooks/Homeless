@@ -1,25 +1,13 @@
 cmake_minimum_required(VERSION 3.31)
 project(Homeless)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 23)
 
 # 使用相对路径指向项目内的SFML库
 set(SFML_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Lib/SFML-3.0.0")
 set(IMGUI_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Lib/ImGUI")
-set(IMGUI_SFML_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Lib/ImGUI-SFML") # 添加ImGui-SFML路径1
-set(IMGUI_SOURCES
-        "${IMGUI_DIR}/imgui.cpp"
-        "${IMGUI_DIR}/imgui_draw.cpp"
-        "${IMGUI_DIR}/imgui_tables.cpp"
-        "${IMGUI_DIR}/imgui_widgets.cpp"
-        "${IMGUI_SFML_DIR}/imgui-SFML.cpp"
-        Window/MainWindow.cpp
-        Window/MainWindow.hpp
-        ECS/Entity.cpp
-        ECS/Entity.hpp
-        Log/LogSystem.cpp
-        Log/LogSystem.hpp
-)
+set(IMGUI_SFML_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Lib/ImGUI-SFML")
+
 # 检查路径是否存在
 if(NOT EXISTS ${SFML_DIR})
     message(FATAL_ERROR "SFML directory not found: ${SFML_DIR}")
@@ -51,9 +39,30 @@ message(STATUS "ImGui-SFML include path: ${IMGUI_SFML_DIR}")
 file(GLOB SFML_LIBS "${SFML_DIR}/lib/*")
 message(STATUS "Found SFML libraries: ${SFML_LIBS}")
 
-add_executable(Homeless
-            Homeless.cpp
-            ${IMGUI_SOURCES}
+add_executable(Homeless Homeless.cpp
+        "${IMGUI_DIR}/imgui.cpp"
+        "${IMGUI_DIR}/imgui_draw.cpp"
+        "${IMGUI_DIR}/imgui_tables.cpp"
+        "${IMGUI_DIR}/imgui_widgets.cpp"
+        "${IMGUI_SFML_DIR}/imgui-SFML.cpp"
+
+        Window/MainWindow.cpp
+        Window/MainWindow.hpp
+
+        components/Entity.cpp
+        components/Entity.hpp
+        components/NPC.cpp
+        components/NPC.hpp
+        components/Player.cpp
+        components/Player.hpp
+
+        Log/LogSystem.cpp
+        Log/LogSystem.hpp
+        Type/Type.hpp
+        Engine/Movement.cpp
+        Engine/Movement.hpp
+        Engine/Attack.cpp
+        Engine/Attack.hpp
 )
 
 # 链接SFML库 - 使用实际找到的库文件名

@@ -9,7 +9,10 @@
 #include "cstring"
 #include "iostream"
 
-#include "../ECS/Entity.hpp"
+#include "../Components/Entity.hpp"
+#include "../Components/NPC.hpp"
+#include "../Components/Player.hpp"
+#include "../Engine/Movement.hpp"
 
 class MainWindow {
 	private:
@@ -22,7 +25,10 @@ class MainWindow {
 		sf::Music *music_ = nullptr;
 		sf::Clock deltaClock_;
 
-		std::vector<Entity> shapes_;
+		std::vector<NPC> npc_;
+		std::vector<Player> player_;
+		int selectedNPCIndex = -1;  // -1表示未选中
+		int selectedPlayerIndex = -1;  // -1表示未选中
 
 		// DPI zoom
 		float dpiScale_ = 1.0f;
@@ -73,7 +79,8 @@ class MainWindow {
 
 			// this->DetectAndSetDPIScaling();		// there are some bugs, so don't use it before fixed it.
 
-			this->shapes_ = std::vector<Entity>(); // 初始化空向量
+			this->npc_ = std::vector<NPC>();
+			this->player_ = std::vector<Player>();
 		}
 
 		MainWindow(const unsigned int x, const unsigned int y, const std::string& Tittle, unsigned int Frames)
@@ -228,6 +235,20 @@ class MainWindow {
 				}
 			}
 
+		// 创建新NPC的函数
+		void AddNPC() {
+			this->npc_.emplace_back(hl_npc::NPCName::NPC_Name_DeadBody,static_cast<unsigned>(hl_npc::NPCBloody::NPC_Bloody_DeadBody),static_cast<unsigned>(hl_npc::NPCAttack::NPC_Bloody_DeadBody));
+				selectedNPCIndex = -1;
+				selectedPlayerIndex = -1;
+			}
+
+		// 创建新Player的函数
+		void AddPlayer() {
+				this->player_.emplace_back("Romi");
+				selectedNPCIndex = -1;
+				selectedPlayerIndex = -1;
+			}
+
 		~MainWindow() {
 			ImGui::SFML::Shutdown(); // 关闭ImGui
 			delete window_;
@@ -238,83 +259,125 @@ class MainWindow {
 		}
 
 		auto Run() -> void {
-			while (this->window_->isOpen()) {
-				// Process events
-				while (const auto event = this->window_->pollEvent()) {
-					// 将事件传递给ImGui
-					ImGui::SFML::ProcessEvent(*window_, *event);
+		    while (this->window_->isOpen()) {
+		        // 事件处理
+		        while (const auto event = this->window_->pollEvent()) {
+		            ImGui::SFML::ProcessEvent(*window_, *event);
+		            if (event->is<sf::Event::Closed>()) {
+		                this->window_->close();
+		            }
+		        }
 
-					// Close window: exit
-					if (event->is<sf::Event::Closed>()) {
-						this->window_->close();
-					}
-				}
+		        // 更新ImGui
+		        ImGui::SFML::Update(*this->window_, this->deltaClock_.restart());
+		        this->CreateImGuiInterface();  // 确保这里没有覆盖或关闭后续窗口
 
-					// 更新ImGui
-					ImGui::SFML::Update(*this->window_, this->deltaClock_.restart());
+		        // 清除屏幕
+		        this->window_->clear();
 
-					// 创建ImGui界面
-					this->CreateImGuiInterface();
+		    	// 处理鼠标右键点击
+		    	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Right)) {
+		    		sf::Vector2i mousePosWindow = sf::Mouse::getPosition(*this->window_);
+		    		sf::Vector2f mousePosWorld = this->window_->mapPixelToCoords(mousePosWindow);
 
-					// Clear screen
-					this->window_->clear();
+		    		// 重置选中状态和索引
+		    		selectedNPCIndex = -1;
+		    		selectedPlayerIndex = -1;
+		    		for (auto& npc : npc_) npc.SetSelected(false);
+		    		for (auto& player : player_) player.SetSelected(false);
 
-					for (auto& entity : shapes_) {
-						entity.Draw(*window_);
-					}
+		    		// 检查NPC选中（记录索引）
+		    		for (size_t i = 0; i < npc_.size(); ++i) {  // 用索引遍历
+		    			auto& npc = npc_[i];
+		    			if (npc.GetShape()->getGlobalBounds().contains(mousePosWorld)) {
+		    				npc.SetSelected(true);
+		    				selectedNPCIndex = i;  // 保存索引
+		    				break;
+		    			}
+		    		}
 
+		    		// 检查Player选中（记录索引，优先级更高）
+		    		for (size_t i = 0; i < player_.size(); ++i) {  // 用索引遍历
+		    			auto& player = player_[i];
+		    			if (player.GetShape()->getGlobalBounds().contains(mousePosWorld)) {
+		    				player.SetSelected(true);
+		    				selectedPlayerIndex = i;  // 保存索引
+		    				selectedNPCIndex = -1;    // 清除NPC选中
+		    				break;
+		    			}
+		    		}
+		    	}
 
-{
-						if (!this->shapes_.empty()) {
-							if (this->shapes_.begin()->GetShape()->getPosition().x < 0) {
-								this->shapes_.begin()->GetShape()->setPosition({0, this->shapes_.begin()->GetShape()->getPosition().y});
-								std::cout << "Move to x left edge, set x to 0!" << std::endl;
-							}
-							if (this->shapes_.begin()->GetShape()->getPosition().y < 0) {
-								this->shapes_.begin()->GetShape()->setPosition({this->shapes_.begin()->GetShape()->getPosition().x, 0});
-								std::cout << "Move to y top edge, set y to 0!" << std::endl;
-							}
-							if (this->shapes_.begin()->GetShape()->getPosition().x + (2 * this->shapes_.begin()->GetRadius()) > this->window_->getSize().x) {
-								this->shapes_.begin()->GetShape()->setPosition({(this->window_->getSize().x - 2 * this->shapes_.begin()->GetRadius()),
-																					this->shapes_.begin()->GetShape()->getPosition().y});
-								std::cout << "Move to x right edge, set x to " << this->window_->getSize().x << "!" << std::endl;
-							}
-							if (this->shapes_.begin()->GetShape()->getPosition().y + (2 * this->shapes_.begin()->GetRadius()) > this->window_->getSize().y) {
-								this->shapes_.begin()->GetShape()->setPosition({this->shapes_.begin()->GetShape()->getPosition().x,
-																					(this->window_->getSize().y - 2 * this->shapes_.begin()->GetRadius())});
-								std::cout << "Move to y down edge, set y to " << this->window_->getSize().y << "!" << std::endl;
-							}
-							else {
-								if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::Right) || sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::D)) {
-									this->shapes_.begin()->Move(MoveSig::RIGHT);
-								}
-								if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::Left) || sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::A)) {
-									this->shapes_.begin()->Move(MoveSig::LEFT);
-								}
-								if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::Up) || sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::W)) {
-									this->shapes_.begin()->Move(MoveSig::UP);
-								}
-								if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::Down) || sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::S)) {
-									this->shapes_.begin()->Move(MoveSig::DOWN);
-								}
-							}
-						}
-					}
+		        // 处理移动和渲染NPC
+		        for (auto& npc : npc_) {
+		            auto* shape = npc.GetShape();
+		            if (npc.IsSelected()) {
+		                shape->setOutlineColor(sf::Color::Yellow);
+		                shape->setOutlineThickness(3.f);
+		                Move(npc, *window_);
+		            } else {
+		                shape->setOutlineThickness(0.f);
+		            }
+		            npc.Draw(*window_);
+		        }
 
-					// Draw the sprite
-					this->window_->draw(*this->sprite_);
+		        // 处理移动和渲染Player
+		        for (auto& player : player_) {
+		            auto* shape = player.GetShape();
+		            if (player.IsSelected()) {
+		                shape->setOutlineColor(sf::Color::Yellow);
+		                shape->setOutlineThickness(3.f);
+		                Move(player, *window_);
+		            } else {
+		                shape->setOutlineThickness(0.f);
+		            }
+		            player.Draw(*window_);
+		        }
 
-					if (this->text_ != nullptr) {
-						this->window_->draw(*this->text_);
-					}
+		    	// 渲染NPC状态窗口（通过索引访问，先检查有效性）
+		    	if (selectedNPCIndex != -1 && selectedNPCIndex < (int)npc_.size()) {
+		    		auto& selectedNPC = npc_[selectedNPCIndex];  // 通过索引获取有效引用
+		    		ImGui::Begin("NPC Status");
 
-					// 渲染ImGui
-					ImGui::SFML::Render(*this->window_);
+		    		ImGui::Text("Active NPC");
+		    		ImGui::Text("Name: %s", hl_name::GetNPCName(selectedNPC.GetNPCName()).c_str());
+		    		ImGui::Text("HP: %d", selectedNPC.GetHP());
+		    		ImGui::Text("Attack: %d", selectedNPC.GetAttack());
+		    		ImGui::Text("Position: %.1f, %.1f",
+							   selectedNPC.GetPosition().x,
+							   selectedNPC.GetPosition().y);
 
-					// Update the window
-					this->window_->display();
-				}
-			}
+		    		ImGui::End();
+		    	}
+
+		    	// 渲染Player状态窗口
+		    	if (selectedPlayerIndex != -1 && selectedPlayerIndex < (int)player_.size()) {
+		    		auto& selectedPlayer = player_[selectedPlayerIndex];  // 通过索引获取有效引用
+		    		ImGui::Begin("Player Status");
+
+		    		ImGui::Text("Active Player");
+		    		ImGui::Text("Name: %s", selectedPlayer.GetPlayerName().c_str());
+		    		ImGui::Text("HP: %d", selectedPlayer.GetHP());
+		    		ImGui::Text("Attack: %d", selectedPlayer.GetAttack());
+		    		ImGui::Text("Position: %.1f, %.1f",
+							   selectedPlayer.GetPosition().x,
+							   selectedPlayer.GetPosition().y);
+
+		    		ImGui::End();
+		    	}
+
+		        // 绘制其他元素
+		        this->window_->draw(*this->sprite_);
+		        if (this->text_ != nullptr) {
+		            this->window_->draw(*this->text_);
+		        }
+
+		        // 渲染ImGui（必须在所有绘制之后）
+		        ImGui::SFML::Render(*this->window_);
+		        this->window_->display();
+		    }
+		}
+
 
 		auto CreateImGuiInterface() -> void {
 				// 1. 显示一个简单的窗口
@@ -337,12 +400,13 @@ class MainWindow {
 						}
 					}
 
-					// if (ImGui::Button("Demo Window")) {
-					// 	showDemoWindow_ = !showDemoWindow_;
-					// }
+
+					if (ImGui::Button("Load NPC")) {
+						this->AddNPC();
+					}
 
 					if (ImGui::Button("Load Player")) {
-						this->shapes_.emplace_back(10.f, sf::Color(255, 255, 255));
+						this->AddPlayer();
 					}
 
 					if (ImGui::Button("Load Background")) {
@@ -367,8 +431,6 @@ class MainWindow {
 
 						ImGui::Text("Text:");
 
-						// 创建文本框
-						// ImGuiInputTextFlags_EnterReturnsTrue 表示按下回车键时返回true
 						if (ImGui::InputText("##Input Lable", textInputBuffer, IM_ARRAYSIZE(textInputBuffer),
 											ImGuiInputTextFlags_EnterReturnsTrue))
 						{
@@ -406,11 +468,6 @@ class MainWindow {
 
 					ImGui::End();
 				}
-
-				// // 3. 显示ImGui演示窗口（非常有用的调试工具）
-				// if (showDemoWindow_) {
-				// 	ImGui::ShowDemoWindow(&showDemoWindow_);
-				// }
 
 				// 设置窗口背景颜色
 				sf::Color bgColor(
