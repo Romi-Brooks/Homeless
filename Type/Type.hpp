@@ -31,26 +31,55 @@ namespace hl_npc {
 		NPC_Killable,
 		NPC_Unkillable
 	};
+
+	namespace move_speed{
+		inline float NPC_Name_DeadBody = 1.5;
+	}
 }
 
 namespace hl_player {
-	enum class PlayerLevel {
-		Player_Level_1 = 1,
-		Player_Level_2,
-		Player_Level_3
-	};
+
 
 }
 
-namespace hl_name {
+namespace hl_trans {
 	inline auto GetNPCName(const hl_npc::NPCName name) -> std::string {
 		switch (name) {
 			case hl_npc::NPCName::NPC_Name_DeadBody: {
-				return "Dead Body";
+				return "NPC_Dead_Body";
 			}
 			default: {
 				return "";
 			}
+		}
+	}
+	inline auto GetNPCType(const hl_npc::NPCType type) -> std::string {
+		switch (type) {
+		case hl_npc::NPCType::NPC_Type_Negative: {
+			return "NPC_Negative";
+		}
+		case hl_npc::NPCType::NPC_Type_Neutral: {
+			return "NPC_Neutral";
+		}
+		case hl_npc::NPCType::NPC_Type_Positive: {
+			return "NPC_Positive";
+		}
+		default: {
+			return "";
+		}
+		}
+	}
+	inline auto GetNPCKillable(const hl_npc::NPCKillable killable) -> std::string {
+		switch (killable) {
+		case hl_npc::NPCKillable::NPC_Killable: {
+			return "NPC_Killable";
+		}
+		case hl_npc::NPCKillable::NPC_Unkillable: {
+			return "NPC_UnKillable";
+		}
+		default: {
+			return "";
+		}
 		}
 	}
 }

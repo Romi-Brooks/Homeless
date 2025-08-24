@@ -14,7 +14,7 @@ enum class Movement {
 class Entity {
 	protected:
 
-		sf::Texture *texture_ = nullptr;
+		std::unique_ptr<sf::Texture> texture_;
 
 		std::unique_ptr<sf::CircleShape> shape_;
 
@@ -28,7 +28,6 @@ class Entity {
 
 		virtual ~Entity() = default;
 
-		// 移动构造函数
 		Entity(Entity&& other) noexcept : shape_(std::move(other.shape_)), hp_(other.hp_), attack_(other.attack_) {}
 
 		// 移动赋值运算符
@@ -39,19 +38,16 @@ class Entity {
 				return *this;
 			}
 
-		// 创建圆形纹理的函数
 		auto CreateCircleWithColor(float radius, const sf::Color& color) -> sf::Shape* {
-			shape_ = std::make_unique<sf::CircleShape>(radius);
-
-			shape_->setFillColor(color);
-			return shape_.get(); // 返回原始指针（如果需要）
-		}
+				shape_ = std::make_unique<sf::CircleShape>(radius);
+				shape_->setFillColor(color);
+				return shape_.get();
+			}
 
 		auto CreateCircle(float radius) -> sf::Shape* {
 				shape_ = std::make_unique<sf::CircleShape>(radius);
-
-				return shape_.get(); // 返回原始指针（如果需要）
-		}
+				return shape_.get();
+			}
 
 		auto LoadTexture(const std::string& path) const -> bool {
 			if (this->texture_->loadFromFile(path) == false) {
@@ -62,34 +58,13 @@ class Entity {
 				return false;
 			}
 
-			this->shape_->setTexture(this->texture_);
+			this->shape_->setTexture(this->texture_.get());
 			this->shape_->setTextureRect(sf::IntRect());
 			return true;
 		}
 
-		auto Move(const Movement Signal) const -> void {
-			auto x = this->shape_->getPosition().x;
-			auto y = this->shape_->getPosition().y;
-
-			switch (Signal) {
-				case Movement::Entity_MoveLeft: {
-					this->shape_->setPosition({x - 1, y});
-					break;
-				}
-				case Movement::Entity_MoveRight: {
-					this->shape_->setPosition({x + 1, y});
-					break;
-				}
-				case Movement::Entity_MoveUp: {
-					this->shape_->setPosition({x, y - 1});
-					break;
-				}
-				case Movement::Entity_MoveDown: {
-					this->shape_->setPosition({x, y + 1});
-					break;
-				}
-				default: break;
-			}
+		virtual auto Move(const Movement Signal) const -> void {
+				// should give to subclass
 		}
 
 		auto Attack(Entity& target) const -> bool {
@@ -111,9 +86,10 @@ class Entity {
 
 		auto SetSelected(bool selected) -> void { isSelected_ = selected; }
 
-		auto setPosition(float x, float y) -> bool {
+		virtual auto setPosition(float x, float y) -> bool {
 				shape_->setPosition({x, y});
-		}
+				return true;
+			}
 
 
 		auto IsAlive() const ->bool { return this->hp_ > 0; }
@@ -141,7 +117,7 @@ class Entity {
 			return	this->shape_.get()->getPosition();
 		}
 
-		auto Draw(sf::RenderWindow& window) const -> void {
+		virtual auto Draw(sf::RenderWindow& window) const -> void {
 				if (shape_) {
 					window.draw(*shape_);
 				}

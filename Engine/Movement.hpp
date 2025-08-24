@@ -15,7 +15,7 @@ inline auto Move(const Entity& entity, const sf::Window& window) {
 	auto position = entity.GetShape()->getPosition();
 	const auto windowSize = window.getSize();
 
-		// 边界检测与修正
+		// Edge Detect
 		bool hitBoundary = false;
 
 		if (position.x < 0) {
@@ -40,7 +40,7 @@ inline auto Move(const Entity& entity, const sf::Window& window) {
 			hitBoundary = true;
 		}
 
-		// 如果没有碰到边界，处理移动
+		// Movement
 		if (!hitBoundary) {
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) {
 				entity.Move(Movement::Entity_MoveRight);

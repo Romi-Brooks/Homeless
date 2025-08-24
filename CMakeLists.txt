@@ -63,6 +63,12 @@ add_executable(Homeless Homeless.cpp
         Engine/Movement.hpp
         Engine/Attack.cpp
         Engine/Attack.hpp
+        Engine/Generate.cpp
+        Engine/Generate.hpp
+        Engine/Position.cpp
+        Engine/Position.hpp
+        Engine/Random.cpp
+        Engine/Random.hpp
 )
 
 # 链接SFML库 - 使用实际找到的库文件名
