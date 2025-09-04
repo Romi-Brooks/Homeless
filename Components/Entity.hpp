@@ -49,7 +49,7 @@ class Entity {
 				return shape_.get();
 			}
 
-		auto LoadTexture(const std::string& path) const -> bool {
+		[[nodiscard]] auto LoadTexture(const std::string& path) const -> bool {
 			if (this->texture_->loadFromFile(path) == false) {
 				return false;
 			}
@@ -92,29 +92,29 @@ class Entity {
 			}
 
 
-		auto IsAlive() const ->bool { return this->hp_ > 0; }
+		[[nodiscard]] auto IsAlive() const ->bool { return this->hp_ > 0; }
 
-		auto IsSelected() const -> bool { return isSelected_; }
+		[[nodiscard]] auto IsSelected() const -> bool { return isSelected_; }
 
 
-		auto GetShape() const -> sf::Shape* {
+		[[nodiscard]] auto GetShape() const -> sf::Shape* {
 			return shape_.get();
 		}
 
-		auto GetRadius() const -> float {
-			return shape_.get()->getRadius();
+		[[nodiscard]] auto GetRadius() const -> float {
+			return shape_->getRadius();
 		}
 
-		auto GetHP() const -> unsigned int {
+		[[nodiscard]] auto GetHP() const -> unsigned int {
 			return this->hp_;
 		}
 
-		auto GetAttack() const -> unsigned int {
+		[[nodiscard]] auto GetAttack() const -> unsigned int {
 			return this->attack_;
 		}
 
-		auto GetPosition() const -> sf::Vector2f {
-			return	this->shape_.get()->getPosition();
+		[[nodiscard]] auto GetPosition() const -> sf::Vector2f {
+			return	this->shape_->getPosition();
 		}
 
 		virtual auto Draw(sf::RenderWindow& window) const -> void {

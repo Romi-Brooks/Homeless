@@ -10,21 +10,14 @@ namespace hl_type{
 
 namespace hl_npc {
 	enum class NPCType {
-		NPC_Type_Negative,
-		NPC_Type_Neutral,
-		NPC_Type_Positive
+		NPC_Negative,
+		NPC_Neutral,
+		NPC_Positive
 	};
 
 	enum class NPCName {
-		NPC_Name_DeadBody,
-	};
-
-	enum class NPCBloody {
-		NPC_Bloody_DeadBody = 35,
-	};
-
-	enum class NPCAttack {
-		NPC_Bloody_DeadBody = 5,
+		NPC_DeadBody,
+		NPC_FatNinja,
 	};
 
 	enum class NPCKillable {
@@ -32,8 +25,18 @@ namespace hl_npc {
 		NPC_Unkillable
 	};
 
-	namespace move_speed{
-		inline float NPC_Name_DeadBody = 1.5;
+	namespace npc_bloody {
+		inline unsigned NPC_DeadBody = 55;
+		inline unsigned NPC_FatNinja = 80;
+	}
+
+	namespace npc_attack {
+		inline float NPC_DeadBody = 3;
+		inline float NPC_FatNinja = 2.5;
+	}
+
+	namespace npc_move_speed{
+		inline float NPC_DeadBody = 1.5;
 	}
 }
 
@@ -45,7 +48,7 @@ namespace hl_player {
 namespace hl_trans {
 	inline auto GetNPCName(const hl_npc::NPCName name) -> std::string {
 		switch (name) {
-			case hl_npc::NPCName::NPC_Name_DeadBody: {
+			case hl_npc::NPCName::NPC_DeadBody: {
 				return "NPC_Dead_Body";
 			}
 			default: {
@@ -55,13 +58,13 @@ namespace hl_trans {
 	}
 	inline auto GetNPCType(const hl_npc::NPCType type) -> std::string {
 		switch (type) {
-		case hl_npc::NPCType::NPC_Type_Negative: {
+		case hl_npc::NPCType::NPC_Negative: {
 			return "NPC_Negative";
 		}
-		case hl_npc::NPCType::NPC_Type_Neutral: {
+		case hl_npc::NPCType::NPC_Neutral: {
 			return "NPC_Neutral";
 		}
-		case hl_npc::NPCType::NPC_Type_Positive: {
+		case hl_npc::NPCType::NPC_Positive: {
 			return "NPC_Positive";
 		}
 		default: {

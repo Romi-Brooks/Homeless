@@ -3,7 +3,7 @@
 
 #include "Entity.hpp"
 #include "../Type/Type.hpp"
-#include "../Engine/Random.hpp"
+#include "../Engine/Utilities/Random.hpp"
 
 
 class NPC : public Entity{
