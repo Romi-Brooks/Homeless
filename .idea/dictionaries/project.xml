@@ -1,7 +1,14 @@
 <component name="ProjectDictionaryState">
   <dictionary name="project">
     <words>
+      <w>moveevent</w>
+      <w>musicconfig</w>
+      <w>musicfade</w>
       <w>npcs</w>
+      <w>sfxconfig</w>
+      <w>sfxmanager</w>
+      <w>transer</w>
+      <w>volumemanager</w>
     </words>
   </dictionary>
 </component>

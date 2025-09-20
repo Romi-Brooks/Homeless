@@ -3,7 +3,7 @@ project(Homeless)
 
 set(CMAKE_CXX_STANDARD 23)
 
-# 使用相对路径指向项目内的SFML库
+# set lib
 set(SFML_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Lib/SFML-3.0.0")
 set(IMGUI_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Lib/ImGUI")
 set(IMGUI_SFML_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Lib/ImGUI-SFML")
@@ -26,7 +26,7 @@ include_directories(
         ${IMGUI_SFML_DIR}
 )
 
-# 添加库目录 - 使用绝对路径确保可靠性
+# Add lib
 link_directories("${SFML_DIR}/lib")
 
 # 打印调试信息
@@ -40,44 +40,65 @@ file(GLOB SFML_LIBS "${SFML_DIR}/lib/*")
 message(STATUS "Found SFML libraries: ${SFML_LIBS}")
 
 add_executable(Homeless Homeless.cpp
+        # Libs
         "${IMGUI_DIR}/imgui.cpp"
         "${IMGUI_DIR}/imgui_draw.cpp"
         "${IMGUI_DIR}/imgui_tables.cpp"
         "${IMGUI_DIR}/imgui_widgets.cpp"
         "${IMGUI_SFML_DIR}/imgui-SFML.cpp"
 
-        Window/MainWindow.cpp
-        Window/MainWindow.hpp
+        # Temp: Window
+        Stage/MainWindow.cpp
+        Stage/MainWindow.hpp
 
-        components/Entity.cpp
-        components/Entity.hpp
-        components/NPC.cpp
-        components/NPC.hpp
-        components/Player.cpp
-        components/Player.hpp
+        # Engine: Entities
+        Engine/Entities/Entity.cpp
+        Engine/Entities/Entity.hpp
+        Engine/Entities/NPC.cpp
+        Engine/Entities/NPC.hpp
+        Engine/Entities/Player.cpp
+        Engine/Entities/Player.hpp
 
-        Log/LogSystem.cpp
-        Log/LogSystem.hpp
-        Type/Type.hpp
-
-        Engine/Movement.cpp
-        Engine/Movement.hpp
-        Engine/Attack.cpp
-        Engine/Attack.hpp
-        Engine/Generate.cpp
-        Engine/Generate.hpp
-        Engine/Position.cpp
-        Engine/Position.hpp
-        Engine/utilities/Random.cpp
-        Engine/utilities/Random.hpp
-        Engine/Entity/Entity.cpp
-        Engine/Entity/Entity.hpp
-        Engine/Audio/Audio.cpp
-        Engine/Audio/Audio.hpp
+        # Engine: Audio
+        Engine/Audio/SFXManager.cpp
+        Engine/Audio/SFXManager.hpp
+        Engine/Audio/MusicFade.cpp
+        Engine/Audio/MusicFade.hpp
         Engine/Audio/Music.cpp
         Engine/Audio/Music.hpp
-        Engine/Window/Manager.cpp
-        Engine/Window/Manager.hpp
+        Engine/Audio/SFX.cpp
+        Engine/Audio/SFX.hpp
+
+        # Engine: Physics
+        Engine/Physics/Edge/EdgeDetect.hpp
+
+        # Engine: Actions
+        Engine/Actions/Generation/Generate.cpp
+        Engine/Actions/Generation/Generate.hpp
+
+        # Engine: Toolkits
+        Engine/Utilities/Random.cpp
+        Engine/Utilities/Random.hpp
+
+        # Engine: Window
+        Engine/Windows/Manager.cpp
+        Engine/Windows/Manager.hpp
+        Engine/Windows/Windows.cpp
+        Engine/Windows/Windows.hpp
+
+        # Engine: Log
+        Engine/Log/LogSystem.cpp
+        Engine/Log/LogSystem.hpp
+
+        # Config Toolkits
+        Engine/Config/Entities/NPC.hpp
+        Engine/Config/Entities/Player.hpp
+        Engine/Config/Utilities/Transer.hpp
+        Engine/Config/Events/MoveEvent.hpp
+        Engine/Config/Audios/Music.hpp
+        Engine/Audio/VolumeManager.cpp
+        Engine/Audio/VolumeManager.hpp
+
 )
 
 # 链接SFML库 - 使用实际找到的库文件名
