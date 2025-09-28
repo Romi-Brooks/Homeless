@@ -1,14 +1,19 @@
 <component name="ProjectDictionaryState">
   <dictionary name="project">
     <words>
+      <w>imgui</w>
       <w>moveevent</w>
       <w>musicconfig</w>
       <w>musicfade</w>
+      <w>npcproperty</w>
       <w>npcs</w>
+      <w>renderwindows</w>
       <w>sfxconfig</w>
       <w>sfxmanager</w>
+      <w>startscreen</w>
       <w>transer</w>
       <w>volumemanager</w>
+      <w>windowsmanager</w>
     </words>
   </dictionary>
 </component>

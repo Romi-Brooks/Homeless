@@ -42,14 +42,14 @@ namespace engine {
 		    bool LoadSFXFiles(const std::string& id, const std::string& filePath) {
 		        // 检查是否已加载
 		        if (soundBuffers_.contains(id)) {
-		            Log::LogOut("SFX with id '" + id + "' is already loaded", LogLevel::HL_WARNING);
+		        	LOG_WARNING(LogChannel::ENGINE_AUDIO_SFX, "SFX with id '" + id + "' is already loaded");
 		            return true; // 已加载视为成功
 		        }
 
 		        // 1. 从文件加载
 		        std::ifstream file(filePath, std::ios::binary | std::ios::ate);
 		        if (!file.is_open()) {
-		            Log::LogOut("Failed to open sfx file: " + filePath + " with id: " + id, LogLevel::HL_ERROR);
+		        	LOG_ERROR(LogChannel::ENGINE_AUDIO_SFX, "Failed to open sfx file: " + filePath + " with id: " + id);
 		            return false;
 		        }
 
@@ -60,7 +60,7 @@ namespace engine {
 		        // 3. 读取文件数据到vector
 		        std::vector<char> data(size);
 		        if (!file.read(data.data(), size)) {
-		            Log::LogOut("Failed to read sfx file: " + filePath + " with id: " + id, LogLevel::HL_ERROR);
+		        	LOG_ERROR(LogChannel::ENGINE_AUDIO_SFX, "Failed to read sfx file: " + filePath + " with id: " + id);
 		            file.close();
 		            return false;
 		        }
@@ -70,13 +70,13 @@ namespace engine {
 		        // 4. 创建SoundBuffer并从内存加载
 		        auto buffer = std::make_unique<sf::SoundBuffer>();
 		        if (!buffer->loadFromMemory(data.data(), data.size())) {
-					Log::LogOut("Failed to load sfx data from memory for id: " + id, LogLevel::HL_ERROR);
+		        	LOG_ERROR(LogChannel::ENGINE_AUDIO_SFX, "Failed to load sfx data from memory for id: " + id);
 		            return false;
 		        }
 
 		        // 5. 将buffer移动到map中（转移所有权）
 		        soundBuffers_.emplace(id, std::move(buffer));
-		        Log::LogOut("Successfully loaded SFX: " + id, LogLevel::HL_INFO);
+		    	LOG_INFO(LogChannel::ENGINE_AUDIO_SFX, "Successfully loaded SFX: " + id);
 
 		        return true;
 		    }
@@ -97,17 +97,17 @@ namespace engine {
 		        auto it = soundBuffers_.find(id);
 		        if (it != soundBuffers_.end()) {
 		            soundBuffers_.erase(it);
-		            Log::LogOut("Unloaded SFX: " + id, LogLevel::HL_INFO);
+		        	LOG_INFO(LogChannel::ENGINE_AUDIO_SFX, "Unloaded SFX: " + id);
 		            return true;
 		        }
-		        Log::LogOut("SFX not found for unloading: " + id, LogLevel::HL_WARNING);
+		    	LOG_WARNING(LogChannel::ENGINE_AUDIO_SFX, "SFX not found for unloading: " + id);
 		        return false;
 		    }
 
 		    // 卸载所有SFX
 		    void UnloadAll() {
 		        soundBuffers_.clear();
-		        Log::LogOut("All SFX resources unloaded", LogLevel::HL_INFO);
+		    	LOG_INFO(LogChannel::ENGINE_AUDIO_SFX, "All SFX resources unloaded");
 		    }
 
 		    // 获取已加载SFX数量

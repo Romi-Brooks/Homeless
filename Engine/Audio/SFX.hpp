@@ -48,14 +48,14 @@ namespace engine {
 	        auto Load(const std::string& id, const std::string& filePath) -> bool {
 	            // First, load the buffer through SFXManager
 	            if (!SFXManager::GetManager().LoadSFXFiles(id, filePath)) {
-	                Log::LogOut("Error when loading SFX: " + id, LogLevel::HL_ERROR);
+	            	LOG_ERROR(LogChannel::ENGINE_AUDIO_SFX, "Error when loading SFX: " + id);
 	                return false;
 	            }
 
 	            // Get the buffer from SFXManager
 	            const auto buffer = SFXManager::GetManager().GetSFXBuffer(id);
 	            if (!buffer) {
-	                Log::LogOut("Error getting buffer for SFX: " + id, LogLevel::HL_ERROR);
+	            	LOG_ERROR(LogChannel::ENGINE_AUDIO_SFX, "Error getting buffer for SFX: " + id);
 	                return false;
 	            }
 
@@ -73,7 +73,7 @@ namespace engine {
 	            if (it != sounds_.end() && it->second) {
 	                it->second->play();
 	            } else {
-	                Log::LogOut("SFX not found or not loaded: " + id, LogLevel::HL_WARNING);
+	            	LOG_WARNING(LogChannel::ENGINE_AUDIO_SFX, "SFX not found or not loaded: " + id);
 	            }
 	        }
 

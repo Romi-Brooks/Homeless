@@ -3,7 +3,9 @@
 
 #include <string>
 #include <utility>
+
 #include "Entity.hpp"
+#include "../Config/Movement/MoveEvent.hpp"
 
 class Player : public Entity {
 	private:
@@ -28,23 +30,12 @@ class Player : public Entity {
 	public:
 		explicit Player(std::string name) :
 			Entity(100, 7), name_(std::move(name)), money_(50) {
-
 			this->CreateCircleWithColor(20, {255,255,255});
-
-			// 初始化判定圈（半透明绿色，不填充仅描边）
-			detectionCircle_.setRadius(detectionRadius_);
-			detectionCircle_.setFillColor(sf::Color::Transparent);
-			detectionCircle_.setOutlineColor(sf::Color(0, 255, 0, 100));
-			detectionCircle_.setOutlineThickness(2.f);
-
-			// 关键修复：将判定圈原点设为中心（与玩家形状同步）
-			detectionCircle_.setOrigin({detectionRadius_ - this->GetRadius(), detectionRadius_ - this->GetRadius()});
 		};
 
 
 		auto Draw(sf::RenderWindow& window) const -> void override {
-				window.draw(detectionCircle_);	// detection line
-				Entity::Draw(window); // circle
+				Entity::Draw(window);
 		}
 
 		auto LevelUp() -> void {
@@ -60,24 +51,24 @@ class Player : public Entity {
 		}
 
 
-		auto Move(const Movement Signal) const -> void override {
+		auto Move(const engine::Movement Signal) const -> void override {
 			auto x = this->shape_->getPosition().x;
 			auto y = this->shape_->getPosition().y;
 
 			switch (Signal) {
-			case Movement::Entity_MoveLeft: {
+			case engine::Movement::Entity_MoveLeft: {
 				this->shape_->setPosition({x - 3, y});
 				break;
 			}
-			case Movement::Entity_MoveRight: {
+			case engine::Movement::Entity_MoveRight: {
 				this->shape_->setPosition({x + 3, y});
 				break;
 			}
-			case Movement::Entity_MoveUp: {
+			case engine::Movement::Entity_MoveUp: {
 				this->shape_->setPosition({x, y - 3});
 				break;
 			}
-			case Movement::Entity_MoveDown: {
+			case engine::Movement::Entity_MoveDown: {
 				this->shape_->setPosition({x, y + 3});
 				break;
 			}

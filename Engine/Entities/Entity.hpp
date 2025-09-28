@@ -4,13 +4,11 @@
 #include <SFML/Graphics.hpp>
 #include <memory>
 
-#include "../Config/Events/MoveEvent.hpp"
+#include "../Config/Movement/MoveEvent.hpp"
 
 class Entity {
 	protected:
-
 		std::unique_ptr<sf::Texture> texture_;
-
 		std::unique_ptr<sf::CircleShape> shape_;
 
 		unsigned int hp_;
@@ -58,7 +56,7 @@ class Entity {
 			return true;
 		}
 
-		virtual auto Move(const Movement Signal) const -> void {
+		virtual auto Move(const engine::Movement Signal) const -> void {
 				// should give to subclass
 		}
 
@@ -70,7 +68,7 @@ class Entity {
 			return true;
 		}
 
-		auto Damage(unsigned int damage) -> bool {
+		auto Damage(const unsigned int damage) -> bool {
 			if (!this->IsAlive()) {
 				return false;
 			}
@@ -79,8 +77,6 @@ class Entity {
 		}
 
 
-		auto SetSelected(bool selected) -> void { isSelected_ = selected; }
-
 		auto setPosition(float x, float y) const -> void {
 			shape_->setPosition({x, y});
 		}
@@ -88,10 +84,6 @@ class Entity {
 
 		[[nodiscard]] auto IsAlive() const ->bool {
 			return this->hp_ > 0;
-		}
-
-		[[nodiscard]] auto IsSelected() const -> bool {
-			return isSelected_;
 		}
 
 		[[nodiscard]] auto GetShape() const -> sf::Shape* {

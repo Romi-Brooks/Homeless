@@ -9,6 +9,7 @@
 
 #ifndef HOMELESS_SFXCONFIG_HPP
 #define HOMELESS_SFXCONFIG_HPP
+
 #include <string>
 
 namespace hl_sfx {

@@ -12,16 +12,25 @@
 #include <mutex>
 
 enum class LogLevel {
-	HL_INFO,
-	HL_WARNING,
-	HL_ERROR,
-	HL_DEBUG
+	ATMOS_INFO,
+	ATMOS_WARNING,
+	ATMOS_ERROR,
+	ATMOS_DEBUG
 };
 
 enum class LogChannel {
-	ENGINE_EDGE_DETECT,
+	ENGINE_PHYSICS_EDGE_DETECT,
+	ENGINE_MOVEMENT,
+
 	ENGINE_AUDIO_MUSIC,
 	ENGINE_AUDIO_SFX,
+	ENGINE_AUDIO_MUSIC_FADE,
+
+	ENGINE_WINDOW,
+	ENGINE_SCREEN,
+	ENGINE_SCREEN_MANAGER,
+
+	GAME_MAIN,
 };
 
 class Log {
@@ -30,22 +39,22 @@ private:
 	~Log() = default;
 
 
-	LogLevel ViewLogLevel = LogLevel::HL_INFO;
+	LogLevel ViewLogLevel = LogLevel::ATMOS_INFO;
 	std::mutex LogMutex;
 
 public:
 	static Log& GetLogInstance();
 
-	static void LogOut(const std::string& I_LogMessage, LogLevel LogLevel = LogLevel::HL_INFO);
+	static void LogOut(LogChannel channel, LogLevel level, const std::string& logMessage);
 	static void SetViewLogLevel(LogLevel ViewLogLevel);
 
 	Log(const Log&) = delete;
 	Log& operator=(const Log&) = delete;
 };
 
-#define LOG_INFO(LogMessage) Log::GetLogInstance().LogOut(LogMessage, BP_INFO)
-#define LOG_WARNING(LogMessage) Log::GetLogInstance().LogOut(LogMessage, BP_WARNING)
-#define LOG_ERROR(LogMessage) Log::GetLogInstance().LogOut(LogMessage, BP_ERROR)
-#define LOG_DEBUG(LogMessage) Log::GetLogInstance().LogOut(LogMessage, BP_DEBUG)
+#define LOG_INFO(channel,logMessage) Log::GetLogInstance().LogOut(channel, LogLevel::ATMOS_INFO, logMessage)
+#define LOG_WARNING(channel,logMessage) Log::GetLogInstance().LogOut(channel, LogLevel::ATMOS_WARNING, logMessage)
+#define LOG_ERROR(channel,logMessage) Log::GetLogInstance().LogOut(channel, LogLevel::ATMOS_ERROR, logMessage)
+#define LOG_DEBUG(channel,logMessage) Log::GetLogInstance().LogOut(channel, LogLevel::ATMOS_DEBUG, logMessage)
 
 #endif //LOG_HPP

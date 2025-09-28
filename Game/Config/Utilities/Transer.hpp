@@ -4,6 +4,7 @@
 #include <string>
 
 #include "../Entities/NPC.hpp"
+#include "../../Engine/Config/Entities/NPC.hpp"
 
 namespace hl_trans {
 	inline auto GetNPCName(const hl_npc::NPCName name) -> std::string {
@@ -16,15 +17,15 @@ namespace hl_trans {
 		}
 		}
 	}
-	inline auto GetNPCType(const hl_npc::NPCType type) -> std::string {
+	inline auto GetNPCType(const engine::npc_property::NPCType type) -> std::string {
 		switch (type) {
-		case hl_npc::NPCType::NPC_Negative: {
+		case engine::npc_property::NPCType::NPC_Negative: {
 			return "NPC_Negative";
 		}
-		case hl_npc::NPCType::NPC_Neutral: {
+		case engine::npc_property::NPCType::NPC_Neutral: {
 			return "NPC_Neutral";
 		}
-		case hl_npc::NPCType::NPC_Positive: {
+		case engine::npc_property::NPCType::NPC_Positive: {
 			return "NPC_Positive";
 		}
 		default: {
@@ -32,12 +33,12 @@ namespace hl_trans {
 		}
 		}
 	}
-	inline auto GetNPCKillable(const hl_npc::NPCKillable killable) -> std::string {
+	inline auto GetNPCKillable(const engine::npc_property::NPCKillable killable) -> std::string {
 		switch (killable) {
-		case hl_npc::NPCKillable::NPC_Killable: {
+		case engine::npc_property::NPCKillable::NPC_Killable: {
 			return "NPC_Killable";
 		}
-		case hl_npc::NPCKillable::NPC_Unkillable: {
+		case engine::npc_property::NPCKillable::NPC_Unkillable: {
 			return "NPC_UnKillable";
 		}
 		default: {

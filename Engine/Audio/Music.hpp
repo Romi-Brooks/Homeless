@@ -40,7 +40,7 @@ namespace engine {
 			auto Load(const std::string& id, const std::string& file) -> bool {
 				// 0. 检查是否已加载
 				if (musics_.contains(id)) {
-					Log::LogOut("Music with id '" + id + "' is already loaded", LogLevel::HL_WARNING);
+					LOG_WARNING(LogChannel::ENGINE_AUDIO_MUSIC, "Music with id '" + id + "' is already loaded");
 					return true; // 已加载视为成功
 				}
 
@@ -48,13 +48,13 @@ namespace engine {
 				auto music = std::make_unique<sf::Music>(file);
 
 				if (!music) {
-					Log::LogOut("Failed to load music from file for id: " + id, LogLevel::HL_ERROR);
+					LOG_ERROR(LogChannel::ENGINE_AUDIO_MUSIC, "Failed to load music from file for id: " + id);
 					return false;
 				}
 
 				// 2. 存放到map
 				musics_[id] = std::move(music);
-				Log::LogOut("Successfully loaded music from file for id: " + id, LogLevel::HL_INFO);
+				LOG_INFO(LogChannel::ENGINE_AUDIO_MUSIC, "Successfully loaded music from file for id: " + id);
 
 				return true;
 			}

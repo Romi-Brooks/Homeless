@@ -16,16 +16,30 @@
 #include "LogSystem.hpp"
 
 
-// Foward Function
-std::string GetLogLevel(const LogLevel& LogLevel) {
-    std::string LevelStr;
-    switch (LogLevel) {
-        case LogLevel::HL_INFO: LevelStr = "INFO"; break;
-        case LogLevel::HL_WARNING: LevelStr = "WARNING"; break;
-        case LogLevel::HL_ERROR: LevelStr = "ERROR"; break;
-        case LogLevel::HL_DEBUG: LevelStr = "DEBUG"; break;
+// Forward Function
+std::string GetLogLevel(const LogLevel& logLevel) {
+    switch (logLevel) {
+        case LogLevel::ATMOS_INFO: return "INFO";
+        case LogLevel::ATMOS_WARNING: return"WARNING";
+        case LogLevel::ATMOS_ERROR: return "ERROR";
+        case LogLevel::ATMOS_DEBUG: return "DEBUG";
     }
-    return LevelStr;
+	return "Call func with error level.";
+}
+
+std::string GetLogChannel(const LogChannel& channel) {
+	switch (channel) {
+	case LogChannel::ENGINE_AUDIO_MUSIC: return "Engine.Audio.Music -> ";
+	case LogChannel::ENGINE_AUDIO_SFX: return"Engine.Audio.SFX -> ";
+	case LogChannel::ENGINE_AUDIO_MUSIC_FADE: return "Engine.Audio.Music.Fade -> ";
+	case LogChannel::ENGINE_PHYSICS_EDGE_DETECT: return "Engine.Physics.EdgeDetect -> ";
+	case LogChannel::ENGINE_MOVEMENT: return "Engine.Movement -> ";
+	case LogChannel::ENGINE_WINDOW: return "Engine.Window -> ";
+	case LogChannel::ENGINE_SCREEN: return  "Engine.Screen -> ";
+	case LogChannel::ENGINE_SCREEN_MANAGER: return "Engine.Screen.Manager -> ";
+	case LogChannel::GAME_MAIN: return "Game.Main -> ";
+	}
+	return "Call func with error channel.";
 }
 auto GetCurrentTime() {
     const auto Time = std::chrono::system_clock::now();
@@ -40,10 +54,10 @@ Log& Log::GetLogInstance() {
     return LogInstance;
 }
 
-void Log::LogOut(const std::string& I_LogMessage, LogLevel I_Level) {
+void Log::LogOut(const LogChannel channel, const LogLevel level, const std::string& logMessage) {
     std::lock_guard<std::mutex> lock(GetLogInstance().LogMutex);
 
-    std::string FullLogMessage = "[" + GetCurrentTime().str() + "] [" + GetLogLevel(I_Level) + "] " + I_LogMessage;
+	const std::string FullLogMessage = "[" + GetCurrentTime().str() + "] [" + GetLogLevel(level) + "] " + GetLogChannel(channel) + logMessage;
     std::cout << FullLogMessage << std::endl;
 }
 

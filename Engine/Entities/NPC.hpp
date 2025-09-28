@@ -2,76 +2,53 @@
 #define HOMELESS_NPC_HPP
 
 #include "Entity.hpp"
+
 #include "../Config/Entities/NPC.hpp"
+#include "../Config/Movement/MoveEvent.hpp"
 #include "../Log/LogSystem.hpp"
 
 class NPC : public Entity{
-	private:
+	protected:
 		// NPC Types
-		hl_npc::NPCType npcType_ {};
-		hl_npc::NPCName npcName_ {};
-		hl_npc::NPCKillable npcKillable_ {};
+		engine::npc_property::NPCType npcType_ {};
+		engine::npc_property::NPCKillable npcKillable_ {};
 
 		// NPC Movement
 		float moveSpeed_ {};
 		float moveAcceleration_ {};
 
-		auto SetProperty() -> bool {
-			switch (this->npcName_) {
-				case hl_npc::NPCName::NPC_DeadBody: {
-					this->npcKillable_ = hl_npc::NPCKillable::NPC_Killable;
-					this->npcType_ = hl_npc::NPCType::NPC_Negative;
-					this->moveSpeed_ = hl_npc::npc_move_speed::NPC_DeadBody;
-					this->moveAcceleration_ = hl_npc::npc_move_acceleration::NPC_DeadBody;
-					return true;
-				}
-				default: {
-					return false;
-				}
-			}
-		}
-
 	public:
-		NPC(const hl_npc::NPCName name, const unsigned int hp, const unsigned int attack) :
-			Entity(hp, attack), npcName_(name) {
-			this->SetProperty();
-
+		NPC(const unsigned int hp, const unsigned int attack) : Entity(hp, attack) {
 			// Give a test Shape
 			this->CreateCircleWithColor(15, sf::Color::Red);
-
-
 		};
 
-		auto Move(const Movement Signal) const -> void override {
+		auto Move(const engine::Movement Signal) const -> void override {
 			auto x = this->shape_->getPosition().x;
 			auto y = this->shape_->getPosition().y;
 
 			switch (Signal) {
-				case Movement::Entity_MoveLeft: {
+				case engine::Movement::Entity_MoveLeft: {
 					this->shape_->setPosition({x - (this->moveSpeed_ + this->moveAcceleration_), y});
 					break;
 				}
-				case Movement::Entity_MoveRight: {
+				case engine::Movement::Entity_MoveRight: {
 					this->shape_->setPosition({x + (this->moveSpeed_ + this->moveAcceleration_), y});
 					break;
 				}
-				case Movement::Entity_MoveUp: {
+				case engine::Movement::Entity_MoveUp: {
 					this->shape_->setPosition({x, y - (this->moveSpeed_ + this->moveAcceleration_)});
 					break;
 				}
-				case Movement::Entity_MoveDown: {
+				case engine::Movement::Entity_MoveDown: {
 					this->shape_->setPosition({x, y + (this->moveSpeed_ + this->moveAcceleration_)});
 					break;
 				}
 				default: {
-					Log::LogOut("Error Movement Sign!", LogLevel::HL_ERROR);
+					LOG_ERROR(LogChannel::ENGINE_MOVEMENT,"Error Movement sign!");
 					break;
 				}
 			}
-		}
-
-		[[nodiscard]] auto GetNPCName() const {
-			return this->npcName_;
 		}
 
 		[[nodiscard]] auto GetNPCType() const {

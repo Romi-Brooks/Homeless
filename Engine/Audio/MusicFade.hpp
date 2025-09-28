@@ -19,7 +19,7 @@
 #include "../Log/LogSystem.hpp"
 #include "Music.hpp"
 
-namespace engine {
+namespace engine::sfx {
 	class MusicFade {
 		public:
 		    // 淡入淡出状态
@@ -63,7 +63,7 @@ namespace engine {
 		    auto Switch(const std::string& fromId, const std::string& toId,const float duration = 2.0f) -> bool {
 		        // 检查是否已经在淡入淡出过程中
 		        if (context_.state != FadeState::Idle) {
-		            Log::LogOut("Fade switch is already in progress", LogLevel::HL_WARNING);
+		        	LOG_WARNING(LogChannel::ENGINE_AUDIO_MUSIC_FADE, "Fade switch is already in progress");
 		            return false;
 		        }
 
@@ -72,7 +72,7 @@ namespace engine {
 
 		        // 检查音乐是否存在
 		        if (!music.IsLoaded(fromId) || !music.IsLoaded(toId)) {
-		            Log::LogOut("Cannot switch music: one or both IDs not loaded", LogLevel::HL_ERROR);
+		        	LOG_ERROR(LogChannel::ENGINE_AUDIO_MUSIC_FADE, "Cannot switch music: one or both IDs not loaded");
 		            return false;
 		        }
 

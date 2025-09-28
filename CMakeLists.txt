@@ -47,9 +47,19 @@ add_executable(Homeless Homeless.cpp
         "${IMGUI_DIR}/imgui_widgets.cpp"
         "${IMGUI_SFML_DIR}/imgui-SFML.cpp"
 
-        # Temp: Window
-        Stage/MainWindow.cpp
-        Stage/MainWindow.hpp
+        # Game: Windows
+        Game/Stage/MainWindow.cpp
+        Game/Stage/MainWindow.hpp
+        Game/Stage/Debugger.cpp
+        Game/Stage/Debugger.hpp
+        Game/Stage/StartScreen.cpp
+        Game/Stage/StartScreen.hpp
+        Game/Stage/HUD.cpp
+        Game/Stage/HUD.hpp
+
+        # Game: NPCS
+        Game/Entities/NPC/DeadBody.cpp
+        Game/Entities/NPC/DeadBody.hpp
 
         # Engine: Entities
         Engine/Entities/Entity.cpp
@@ -77,27 +87,33 @@ add_executable(Homeless Homeless.cpp
         Engine/Actions/Generation/Generate.hpp
 
         # Engine: Toolkits
-        Engine/Utilities/Random.cpp
-        Engine/Utilities/Random.hpp
+        Engine/Utilities/Random/Random.cpp
+        Engine/Utilities/Random/Random.hpp
+        Engine/Utilities/Packager/Unpackage.cpp
+        Engine/Utilities/Packager/Unpackage.hpp
 
         # Engine: Window
-        Engine/Windows/Manager.cpp
-        Engine/Windows/Manager.hpp
-        Engine/Windows/Windows.cpp
-        Engine/Windows/Windows.hpp
+        Engine/Windows/RenderWindow.cpp
+        Engine/Windows/RenderWindow.hpp
+        Engine/Windows/Screen.cpp
+        Engine/Windows/Screen.hpp
+        Engine/Windows/ScreenManager.cpp
+        Engine/Windows/ScreenManager.hpp
 
         # Engine: Log
         Engine/Log/LogSystem.cpp
         Engine/Log/LogSystem.hpp
 
-        # Config Toolkits
+        # Game Config
+        Game/Config/Entities/NPC.hpp
+        Game/Config/Entities/Player.hpp
+        Game/Config/Utilities/Transer.hpp
+        Game/Config/Audios/Music.hpp
+        Game/Config/Windows/Windows.hpp
+
+        # Engine Config
+        Engine/Config/Movement/MoveEvent.hpp
         Engine/Config/Entities/NPC.hpp
-        Engine/Config/Entities/Player.hpp
-        Engine/Config/Utilities/Transer.hpp
-        Engine/Config/Events/MoveEvent.hpp
-        Engine/Config/Audios/Music.hpp
-        Engine/Audio/VolumeManager.cpp
-        Engine/Audio/VolumeManager.hpp
 
 )
 
