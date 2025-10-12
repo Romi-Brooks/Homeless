@@ -1,6 +1,10 @@
 #ifndef TYPE_NPC_HPP
 #define TYPE_NPC_HPP
 
+// We use this hpp file to definition that every entity's HP, Attack value
+// However, we also provide native C++ versions and Lua hot-loading versions
+// Ensuring maximum flexibility for modifying game content
+
 namespace hl_npc {
 	enum class NPCName {
 		NPC_DeadBody,

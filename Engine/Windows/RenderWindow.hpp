@@ -10,8 +10,8 @@
 #ifndef HOMELESS_RENDER_WINDOW_HPP
 #define HOMELESS_RENDER_WINDOW_HPP
 
-#include "ScreenManager.hpp"
 #include <SFML/Graphics.hpp>
+#include "Manager/ScreenManager.hpp"
 
 #include <imgui-SFML.h>
 

@@ -9,7 +9,7 @@
 
 #ifndef HOMELESS_NPCPROPERTY_HPP
 #define HOMELESS_NPCPROPERTY_HPP
-namespace engine::npc_property {
+namespace engine::config::npc_property {
 	enum class NPCType {
 		NPC_Negative,
 		NPC_Neutral,

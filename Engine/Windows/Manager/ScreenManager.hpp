@@ -22,10 +22,9 @@
 #include <stack>
 #include <memory>
 
-#include "Screen.hpp"
-#include "iostream"
+#include "../Screen.hpp"
 
-#include "../Log/LogSystem.hpp"
+#include "../../Log/LogSystem.hpp"
 
 namespace engine::window::manager {
 	class ScreenManager {
@@ -50,7 +49,7 @@ namespace engine::window::manager {
 
 			auto LoadScreen(const std::string& name, std::unique_ptr<screen::Screen> screen) -> void {
 				screens_[name] = std::move(screen);
-				LOG_INFO(LogChannel::ENGINE_SCREEN_MANAGER, "Registering screen: " + name);
+				LOG_INFO(log::LogChannel::ENGINE_SCREEN_MANAGER, "Registering screen: " + name);
 			}
 
 			auto SwitchScreen(const std::string& name) -> void { // switch, single render

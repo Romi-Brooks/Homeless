@@ -1,17 +1,29 @@
+/**
+  * @file           : Music.hpp
+  * @author         : Romi Brooks
+  * @brief          :
+  * @attention      :
+  * @date           : 2025/9/20
+  Copyright (c) 2025 Romi Brooks, All rights reserved.
+**/
+
 #ifndef HOMELESS_MUSIC_HPP
 #define HOMELESS_MUSIC_HPP
 
+// Standard Libray
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <chrono>
 
+// Third party Libray
 #include <SFML/Audio/Music.hpp>
 
+// Self Dependencies
 #include "../Log/LogSystem.hpp"
 
 
-namespace engine {
+namespace engine::audio {
 	// UI Background, Interactive Background...
 	class Music {
 		private:
@@ -40,7 +52,7 @@ namespace engine {
 			auto Load(const std::string& id, const std::string& file) -> bool {
 				// 0. 检查是否已加载
 				if (musics_.contains(id)) {
-					LOG_WARNING(LogChannel::ENGINE_AUDIO_MUSIC, "Music with id '" + id + "' is already loaded");
+					LOG_WARNING(log::LogChannel::ENGINE_AUDIO_MUSIC, "Music with id '" + id + "' is already loaded");
 					return true; // 已加载视为成功
 				}
 
@@ -48,22 +60,23 @@ namespace engine {
 				auto music = std::make_unique<sf::Music>(file);
 
 				if (!music) {
-					LOG_ERROR(LogChannel::ENGINE_AUDIO_MUSIC, "Failed to load music from file for id: " + id);
+					LOG_ERROR(log::LogChannel::ENGINE_AUDIO_MUSIC, "Failed to load music from file for id: " + id);
 					return false;
 				}
 
 				// 2. 存放到map
 				musics_[id] = std::move(music);
-				LOG_INFO(LogChannel::ENGINE_AUDIO_MUSIC, "Successfully loaded music from file for id: " + id);
+				LOG_INFO(log::LogChannel::ENGINE_AUDIO_MUSIC, "Successfully loaded music from file for id: " + id);
 
 				return true;
 			}
 
 			auto Play(const std::string& id, const float volume = 100.0f) -> void {
-				auto it = musics_.find(id);
+				const auto it = musics_.find(id);
 				if (it != musics_.end() && it->second) {
 					it->second->setVolume(volume);
 					it->second->play();
+					LOG_INFO(log::LogChannel::ENGINE_AUDIO_MUSIC, "Playing: " + id);
 				}
 			}
 
@@ -71,6 +84,7 @@ namespace engine {
 				const auto it = musics_.find(id);
 				if (it != musics_.end() && it->second) {
 					it->second->stop();
+					LOG_INFO(log::LogChannel::ENGINE_AUDIO_MUSIC, "Stoping: " + id);
 				}
 			}
 
@@ -78,6 +92,7 @@ namespace engine {
 				const auto it = musics_.find(id);
 					if (it != musics_.end() && it->second) {
 						it->second->setVolume(volume);
+						LOG_INFO(log::LogChannel::ENGINE_AUDIO_MUSIC, "Set volume to: " + std::to_string(volume));
 					}
 				}
 

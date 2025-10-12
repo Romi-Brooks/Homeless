@@ -10,8 +10,15 @@
 #ifndef HOMELESS_VOLUMEMANAGER_HPP
 #define HOMELESS_VOLUMEMANAGER_HPP
 
+namespace engine::audio {
+	class VolumeManager {
+		private:
 
-class VolumeManager {};
+		public:
+
+	};
+}
+
 
 
 #endif // HOMELESS_VOLUMEMANAGER_HPP

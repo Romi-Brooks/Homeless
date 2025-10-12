@@ -3,3 +3,5 @@
 //
 
 #include "Music.hpp"
+namespace engine::audio {
+}

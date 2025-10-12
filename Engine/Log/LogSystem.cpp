@@ -1,10 +1,11 @@
-/*  Copyright (c) 2025 Romi Brooks <qq1694821929@gmail.com>
- *  File Name: LogSystem.cpp
- *  Lib: Beeplayer I/O Log System
- *  Author: Romi Brooks
- *  Date: 2025-04-24
- *  Type: I/O, LOG System
- */
+/**
+  * @file           : LogSystem.cpp
+  * @author         : Romi Brooks
+  * @brief          :
+  * @attention      :
+  * @date           : 2025/9/20
+  Copyright (c) 2025 Romi Brooks, All rights reserved.
+**/
 
 #include <string>
 #include <iostream>
@@ -15,6 +16,9 @@
 
 #include "LogSystem.hpp"
 
+using Log = engine::log::Log;
+using LogLevel = engine::log::LogLevel;
+using LogChannel = engine::log::LogChannel;
 
 // Forward Function
 std::string GetLogLevel(const LogLevel& logLevel) {
@@ -29,21 +33,30 @@ std::string GetLogLevel(const LogLevel& logLevel) {
 
 std::string GetLogChannel(const LogChannel& channel) {
 	switch (channel) {
+	case LogChannel::ENGINE_PHYSICS_EDGE_DETECT: return "Engine.Physics.EdgeDetect -> ";
+	case LogChannel::ENGINE_CONFIG_MOVEMENT: return "Engine.Movement -> ";
+
 	case LogChannel::ENGINE_AUDIO_MUSIC: return "Engine.Audio.Music -> ";
 	case LogChannel::ENGINE_AUDIO_SFX: return"Engine.Audio.SFX -> ";
-	case LogChannel::ENGINE_AUDIO_MUSIC_FADE: return "Engine.Audio.Music.Fade -> ";
-	case LogChannel::ENGINE_PHYSICS_EDGE_DETECT: return "Engine.Physics.EdgeDetect -> ";
-	case LogChannel::ENGINE_MOVEMENT: return "Engine.Movement -> ";
+	case LogChannel::ENGINE_AUDIO_PLUG_MUSIC_FADE: return "Engine.Audio.Music.Fade -> ";
+
 	case LogChannel::ENGINE_WINDOW: return "Engine.Window -> ";
 	case LogChannel::ENGINE_SCREEN: return  "Engine.Screen -> ";
 	case LogChannel::ENGINE_SCREEN_MANAGER: return "Engine.Screen.Manager -> ";
+
+	case LogChannel::ENGINE_FILESYSTEM_ENCODER: return "Engine.Filesystem.Encoder -> ";
+
+	case LogChannel::ENGINE_GAME_NPC: return "Game.NPC -> ";
+	case LogChannel::ENGINE_GAME_PLAYER: return "Game.Player -> ";
+	case LogChannel::ENGINE_GAME_SCREEN: return "Game.Screen -> ";
+
 	case LogChannel::GAME_MAIN: return "Game.Main -> ";
 	}
 	return "Call func with error channel.";
 }
 auto GetCurrentTime() {
     const auto Time = std::chrono::system_clock::now();
-    auto TimeT = std::chrono::system_clock::to_time_t(Time);
+	const auto TimeT = std::chrono::system_clock::to_time_t(Time);
     std::stringstream TimeString;
     TimeString << std::put_time(std::localtime(&TimeT), "%Y-%m-%d %X");
     return TimeString;
@@ -61,6 +74,6 @@ void Log::LogOut(const LogChannel channel, const LogLevel level, const std::stri
     std::cout << FullLogMessage << std::endl;
 }
 
-void Log::SetViewLogLevel(LogLevel I_Level) {
-    GetLogInstance().ViewLogLevel = I_Level;
+void Log::SetViewLogLevel(const LogLevel viewLogLevel) {
+    GetLogInstance().ViewLogLevel = viewLogLevel;
 }

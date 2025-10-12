@@ -9,7 +9,7 @@
 
 #ifndef HOMELESS_MOVEEVENT_HPP
 #define HOMELESS_MOVEEVENT_HPP
-namespace engine {
+namespace engine::config::movements {
 	enum class Movement {
 	Entity_MoveUp,
 	Entity_MoveDown,

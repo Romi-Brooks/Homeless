@@ -6,20 +6,24 @@
   * @date           : 2025/9/20
   Copyright (c) 2025 Romi Brooks, All rights reserved.
 **/
+
 #ifndef HOMELESS_MUSICFADE_HPP
 #define HOMELESS_MUSICFADE_HPP
 
-#include <string>
-#include <functional>
+// Standard Libray
 #include <atomic>
-#include <thread>
 #include <chrono>
+#include <functional>
 #include <memory>
+#include <string>
+#include <thread>
 
-#include "../Log/LogSystem.hpp"
-#include "Music.hpp"
+// Self Dependencies
+#include "../../Log/LogSystem.hpp"
+#include "../Music.hpp"
 
-namespace engine::sfx {
+
+namespace engine::audio::plug {
 	class MusicFade {
 		public:
 		    // 淡入淡出状态
@@ -63,7 +67,7 @@ namespace engine::sfx {
 		    auto Switch(const std::string& fromId, const std::string& toId,const float duration = 2.0f) -> bool {
 		        // 检查是否已经在淡入淡出过程中
 		        if (context_.state != FadeState::Idle) {
-		        	LOG_WARNING(LogChannel::ENGINE_AUDIO_MUSIC_FADE, "Fade switch is already in progress");
+		        	LOG_WARNING(log::LogChannel::ENGINE_AUDIO_PLUG_MUSIC_FADE, "Fade switch is already in progress");
 		            return false;
 		        }
 
@@ -72,7 +76,7 @@ namespace engine::sfx {
 
 		        // 检查音乐是否存在
 		        if (!music.IsLoaded(fromId) || !music.IsLoaded(toId)) {
-		        	LOG_ERROR(LogChannel::ENGINE_AUDIO_MUSIC_FADE, "Cannot switch music: one or both IDs not loaded");
+		        	LOG_ERROR(log::LogChannel::ENGINE_AUDIO_PLUG_MUSIC_FADE, "Cannot switch music: one or both IDs not loaded");
 		            return false;
 		        }
 

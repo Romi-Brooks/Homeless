@@ -11,8 +11,7 @@
 #define HOMELESS_WINDOWS_HPP
 namespace hl_windows {
 	enum class Type {
-		Main_Render_Window = 0,
-		ImGUI_Debug_Window = 1,
+
 	};
 }
 #endif // HOMELESS_WINDOWS_HPP
