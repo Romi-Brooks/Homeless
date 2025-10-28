@@ -7,9 +7,11 @@
   Copyright (c) 2025 Romi Brooks, All rights reserved.
 **/
 
-#include "../../Audio/Music.hpp"
+
 #include "lua.hpp"
-#include <iostream>
+
+#include "../../Audio/Music.hpp"
+#include "Log/LogSystem.hpp"
 
 // 获取Music单例（简化宏）
 #define GET_MUSIC_INSTANCE() (engine::audio::Music::GetInstance())
@@ -77,4 +79,5 @@ void registerMusicToLua(lua_State* L) {
 
 	// 将表设置为全局变量"Music"，Lua中可通过Music:Load(...)调用
 	lua_setglobal(L, "Music");
+	LOG_INFO(engine::log::LogChannel::ENGINE_LUA, "Engine.Audio.Music registered successfully.");
 }

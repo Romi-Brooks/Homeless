@@ -19,20 +19,23 @@
 
 #include <unordered_map>
 #include <string>
-#include <stack>
+#include <vector>
 #include <memory>
 
 #include "../Screen.hpp"
 
-#include "../../Log/LogSystem.hpp"
+
 
 namespace engine::window::manager {
 	class ScreenManager {
 		private:
+			// 存储所有已加载的屏幕
 			std::unordered_map<std::string, std::unique_ptr<screen::Screen>> screens_ {};
+			// 当前激活的屏幕 (栈顶屏幕)
 			screen::Screen* currentScreen_ = nullptr;
 			std::string currentScreenName_ {};
-			std::stack<std::pair<std::string, screen::Screen*>> screenStack_;
+			// 改用vector模拟栈, 存储历史屏幕 (从底到顶)
+			std::vector<std::pair<std::string, screen::Screen*>> screenStack_;
 
 
 			ScreenManager() = default;
@@ -42,80 +45,33 @@ namespace engine::window::manager {
 			ScreenManager(const ScreenManager&) = delete;
 			ScreenManager& operator=(const ScreenManager&) = delete;
 
-			static ScreenManager& GetInstance() {
-				static ScreenManager instance;
-				return instance;
-			}
+			static ScreenManager& GetInstance();
 
-			auto LoadScreen(const std::string& name, std::unique_ptr<screen::Screen> screen) -> void {
-				screens_[name] = std::move(screen);
-				LOG_INFO(log::LogChannel::ENGINE_SCREEN_MANAGER, "Registering screen: " + name);
-			}
+			// 加载屏幕并注册到管理器
+			auto LoadScreen(const std::string& name, std::unique_ptr<screen::Screen> screen) -> void;
 
-			auto SwitchScreen(const std::string& name) -> void { // switch, single render
-				const auto it = screens_.find(name);
-				if (it != screens_.end()) {
-					if (currentScreen_) {
-						currentScreen_->OnDeactivate();
-					}
-					currentScreen_ = it->second.get();
-					currentScreenName_ = name;
-					currentScreen_->OnActivate();
-				}
-			}
+			// 切换屏幕（替换当前屏幕，清空栈）
+			auto SwitchScreen(const std::string& name) -> void;
 
-			auto PushScreen(const std::string& name) -> void { // cover render
-				const auto it = screens_.find(name);
-				if (it != screens_.end()) {
-					if (currentScreen_) {
-						screenStack_.push({currentScreenName_, currentScreen_});
-						currentScreen_->OnDeactivate();
-					}
-					currentScreen_ = it->second.get();
-					currentScreenName_ = name;
-					currentScreen_->OnActivate();
-				}
-			}
+			// 压入新屏幕（保留当前屏幕到栈中，新屏幕成为顶层）
+			auto PushScreen(const std::string& name) -> void;
 
-			auto PopScreen() -> void { // the upper window
-				if (!screenStack_.empty()) {
-					if (currentScreen_) {
-						currentScreen_->OnDeactivate();
-					}
-					const auto& previous = screenStack_.top();
-					currentScreenName_ = previous.first;
-					currentScreen_ = previous.second;
-					screenStack_.pop();
-					currentScreen_->OnActivate();
-				}
-			}
+			// 弹出顶层屏幕（恢复栈顶的历史屏幕）
+			auto PopScreen() -> void;
 
-			auto Render(sf::RenderWindow& window) const -> void {
-					if (currentScreen_) {
-						currentScreen_->Render(window);
-					}
-				}
+			// 多屏幕渲染：先渲染栈中所有历史屏幕（从底到顶），再渲染当前顶层屏幕
+			auto Render(sf::RenderWindow& window) const -> void;
 
-			auto HandleEvent(const sf::Event& event) const -> void {
-					if (currentScreen_) {
-						currentScreen_->HandleEvent(event);
-					}
-				}
+			// 事件处理：默认只让顶层屏幕处理事件（可根据需求修改为传递给所有屏幕）
+			auto HandleEvent(const sf::Event& event) const -> void;
 
-			auto Update(const float deltaTime) const -> void {
-					if (currentScreen_) {
-						currentScreen_->Update(deltaTime);
-					}
-			}
+			// 更新逻辑：默认只更新顶层屏幕（可根据需求修改）
+			auto Update(float deltaTime) const -> void;
 
-			const std::string& GetCurrentScreenName() const {
-				return currentScreenName_;
-			}
+			const std::string& GetCurrentScreenName() const;
 
-			auto GetScreenStack() -> std::stack<std::pair<std::string, screen::Screen*>> {
-				return screenStack_;
-			}
-
+			// 获取屏幕栈（返回const引用，避免复制）
+			const std::vector<std::pair<std::string, screen::Screen*>>& GetScreenStack() const;
 	};
 }
 #endif // HOMELESS_WINDOWSMANAGER_HPP

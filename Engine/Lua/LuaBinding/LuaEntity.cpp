@@ -7,11 +7,15 @@
   Copyright (c) 2025 Romi Brooks, All rights reserved.
 **/
 
-#include <iostream>
-#include "../../Entities/Entity.hpp"
-#include "../lua.hpp"
+#include <string>
+
+#include "lua.hpp"
+
+#include "Log/LogSystem.hpp"
+#include "../../Components/Entities/Entity.hpp"
 
 using Entity = engine::entity::Entity;
+
 // 检查Lua栈中的userdata是否为Entity类型
 #define CHECK_ENTITY(L) \
     Entity* entity = *static_cast<Entity**>(luaL_checkudata(L, 1, "EntityMetaTable")); \
@@ -107,7 +111,7 @@ void registerEntityToLua(lua_State* L) {
         {nullptr, nullptr} // 结束标记
     };
     luaL_setfuncs(L, entityMethods, 0);
-
+	LOG_INFO(engine::log::LogChannel::ENGINE_LUA, "Engine.Entity registered successfully.");
     // 弹出元表（清理栈）
     lua_pop(L, 1);
 }

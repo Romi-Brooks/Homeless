@@ -18,7 +18,7 @@ namespace engine::window::screen{
 			virtual ~Screen() = default;
 
 			virtual void Render(sf::RenderWindow& window) = 0;
-			virtual void HandleEvent(const sf::Event& event) = 0;
+			virtual bool HandleEvent(const sf::Event& event) = 0;	// Use Boolean return values to ensure events are handled correctly.
 			virtual void Update(float deltaTime) = 0;
 
 			virtual void OnActivate() {}    // When active

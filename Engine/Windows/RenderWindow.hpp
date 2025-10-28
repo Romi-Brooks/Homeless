@@ -15,6 +15,7 @@
 
 #include <imgui-SFML.h>
 
+
 namespace engine::window {
 	class RenderWindow {
 		public:
@@ -100,13 +101,13 @@ namespace engine::window {
 				while (const auto event = window_.pollEvent()) {
 					ImGui::SFML::ProcessEvent(window_, *event);
 
+					screenManager.HandleEvent(*event);
+
 					if (event->is<sf::Event::Closed>()) {
 						window_.close();
 					}
 				}
 			}
-
-
 		};
 }
 

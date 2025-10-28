@@ -11,10 +11,10 @@
 
 #include <string>
 
-namespace hl_music {
-	inline std::string youdiantian = "Media/Musics/汪苏泷,By2 - 有点甜.mp3";
-	inline std::string fuyu = "Media/Musics/滴滴 - 覆予.mp3";
+#include "Audio/Music.hpp"
 
+namespace hl_music {
+	inline std::string Background_1 = "Media/Musics/Background.mp3";
 }
 
 #endif // HOMELESS_MUSICCONFIG_HPP

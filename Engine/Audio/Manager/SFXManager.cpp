@@ -9,11 +9,14 @@
   Copyright (c) 2025 Romi Brooks, All rights reserved.
 **/
 
+// Standard Library
+#include <fstream>
+
 // Self Dependencies
 #include "SFXManager.hpp"
 #include "../../Log/LogSystem.hpp"
 
-namespace engine::audio {
+namespace engine::audio::manager {
 	SFXManager& SFXManager::GetManager() {
 		static SFXManager manager;
 		return manager;
@@ -22,14 +25,14 @@ namespace engine::audio {
 	bool SFXManager::LoadSFXFiles(const std::string& id, const std::string& filePath) {
 		// 检查是否已加载
 		if (soundBuffers_.contains(id)) {
-			LOG_WARNING(log::LogChannel::ENGINE_AUDIO_SFX, "SFX with id '" + id + "' is already loaded");
+			LOG_WARNING(log::LogChannel::ENGINE_AUDIO_SFX, "SFX with id " + id + ", is already loaded");
 			return true; // 已加载视为成功
 		}
 
 		// 1. 从文件加载
 		std::ifstream file(filePath, std::ios::binary | std::ios::ate);
 		if (!file.is_open()) {
-			LOG_ERROR(log::LogChannel::ENGINE_AUDIO_SFX, "Failed to open sfx file: " + filePath + " with id: " + id);
+			LOG_ERROR(log::LogChannel::ENGINE_AUDIO_SFX, "Failed to open sfx file: " + filePath + ", with id: " + id);
 			return false;
 		}
 

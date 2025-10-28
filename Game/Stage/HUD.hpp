@@ -18,25 +18,9 @@
 class HUD : public engine::window::screen::Screen {
 	public:
 		void Render(sf::RenderWindow& window) override {
-			ImGui::Begin("Game HUD");
-			ImGui::Text("Health: 100");
-			ImGui::Text("Ammo: 30");
-
-			if (ImGui::Button("Back to Start")) {
-				engine::window::manager::ScreenManager::GetInstance().SwitchScreen("Start");
-			}
-
-			if (ImGui::Button("Set FPS To 120")) {
-				window.setFramerateLimit(120);
-			}
-
-			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
-			1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-
-			ImGui::End();
 		}
 
-		void HandleEvent(const sf::Event& event) override {
+		bool HandleEvent(const sf::Event& event) override {
 		}
 
 		void Update(float deltaTime) override {

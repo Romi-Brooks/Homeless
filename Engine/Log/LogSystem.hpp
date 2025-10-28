@@ -1,5 +1,5 @@
 /**
-  * @file           : LogSystem.hpp
+* @file           : LogSystem.hpp
   * @author         : Romi Brooks
   * @brief          :
   * @attention      :
@@ -11,6 +11,8 @@
 #define LOG_HPP
 
 #include <mutex>
+#include <string>
+
 namespace engine::log {
 	enum class LogLevel {
 		ATMOS_INFO,
@@ -19,45 +21,53 @@ namespace engine::log {
 		ATMOS_DEBUG
 	};
 	enum class LogChannel {
-		ENGINE_PHYSICS_EDGE_DETECT,
-		ENGINE_CONFIG_MOVEMENT,
-
 		ENGINE_AUDIO_MUSIC,
 		ENGINE_AUDIO_SFX,
 		ENGINE_AUDIO_PLUG_MUSIC_FADE,
 
-		ENGINE_WINDOW,
+		ENGINE_CONFIG_MOVEMENT,
+
+		ENGINE_ENTITY,
+		ENGINE_ENTITY_NPC,
+		ENGINE_ENTITY_PLAYER,
+
 		ENGINE_SCREEN,
 		ENGINE_SCREEN_MANAGER,
 
+		ENGINE_WINDOW,
+
+		ENGINE_PHYSICS_EDGE_DETECT,
+
 		ENGINE_FILESYSTEM_ENCODER,
 
-		ENGINE_GAME_NPC,
-		ENGINE_GAME_PLAYER,
-		ENGINE_GAME_SCREEN,
+		ENGINE_LUA,
+
+		GAME_NPC,
+		GAME_PLAYER,
+		GAME_SCREEN,
 
 		GAME_MAIN,
 	};
 
 	class Log {
-		private:
+	private:
 
 
-			Log() = default;
-			~Log() = default;
+		Log() = default;
+		~Log() = default;
 
 
-			LogLevel ViewLogLevel = LogLevel::ATMOS_INFO;
-			std::mutex LogMutex;
+		LogLevel ViewLogLevel = LogLevel::ATMOS_INFO;
+		std::mutex LogMutex;
 
-		public:
-			static Log& GetLogInstance();
+	public:
+		static Log& GetLogInstance();
 
-			static void LogOut(LogChannel channel, LogLevel level, const std::string& logMessage);
-			static void SetViewLogLevel(LogLevel viewLogLevel);
+		static void LogOut(LogChannel channel, LogLevel level, const std::string& logMessage);
+		static void SetViewLogLevel(LogLevel viewLogLevel);
 
-			Log(const Log&) = delete;
-			Log& operator=(const Log&) = delete;
+		Log(const Log&) = delete;
+		Log& operator=(const Log&) = delete;
 	};
 }
 

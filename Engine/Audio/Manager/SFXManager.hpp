@@ -12,18 +12,17 @@
 #ifndef HOMELESS_SFXMANAGER_HPP
 #define HOMELESS_SFXMANAGER_HPP
 
-// Standard Libray
-#include <fstream>
+// Standard Library
 #include <string>
 #include <unordered_map>
 #include <memory>
 
-// Third party Libray
+// Third party Library
 #include <SFML/Audio/SoundBuffer.hpp>
 
 
 
-namespace engine::audio {
+namespace engine::audio::manager {
 	class SFXManager {
 		private:
 		    std::unordered_map<std::string, std::unique_ptr<sf::SoundBuffer>> soundBuffers_;

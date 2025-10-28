@@ -10,18 +10,14 @@
 #ifndef HOMELESS_MUSIC_HPP
 #define HOMELESS_MUSIC_HPP
 
-// Standard Libray
+// Standard Library
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <chrono>
 
-// Third party Libray
+// Third party Library
 #include <SFML/Audio/Music.hpp>
-
-// Self Dependencies
-#include "../Log/LogSystem.hpp"
-
 
 namespace engine::audio {
 	// UI Background, Interactive Background...
@@ -31,7 +27,7 @@ namespace engine::audio {
 			std::unordered_map<std::string, std::unique_ptr<sf::Music>> musics_ {};
 
 			// Global volume for all sounds
-			static float global_volume_;
+			static float music_volume_;
 
 			// Private constructor for singleton
 			Music() = default;
@@ -41,67 +37,28 @@ namespace engine::audio {
 			Music(const Music&) = delete;
 			Music& operator=(const Music&) = delete;
 
-
 			// Get singleton instance
-			static Music& GetInstance() {
-				static Music instance;
-				return instance;
-			}
+			static Music& GetInstance();
 
 			// Load a music file
-			auto Load(const std::string& id, const std::string& file) -> bool {
-				// 0. 检查是否已加载
-				if (musics_.contains(id)) {
-					LOG_WARNING(log::LogChannel::ENGINE_AUDIO_MUSIC, "Music with id '" + id + "' is already loaded");
-					return true; // 已加载视为成功
-				}
+			auto Load(const std::string& id, const std::string& file) -> bool;
 
-				// 1. 从文件加载
-				auto music = std::make_unique<sf::Music>(file);
+			auto Play(const std::string& id) -> void;
 
-				if (!music) {
-					LOG_ERROR(log::LogChannel::ENGINE_AUDIO_MUSIC, "Failed to load music from file for id: " + id);
-					return false;
-				}
+			auto Stop(const std::string& id) -> void;
 
-				// 2. 存放到map
-				musics_[id] = std::move(music);
-				LOG_INFO(log::LogChannel::ENGINE_AUDIO_MUSIC, "Successfully loaded music from file for id: " + id);
+			// Set volume for a specific sound effect
+			auto SetVolume(const std::string& id, float volume) -> void;
 
-				return true;
-			}
+			// Instead, We play a sound effect with special volume
+			auto Play(const std::string& id, float volume) -> void;
 
-			auto Play(const std::string& id, const float volume = 100.0f) -> void {
-				const auto it = musics_.find(id);
-				if (it != musics_.end() && it->second) {
-					it->second->setVolume(volume);
-					it->second->play();
-					LOG_INFO(log::LogChannel::ENGINE_AUDIO_MUSIC, "Playing: " + id);
-				}
-			}
+			// Volume Manager use this interface to set the playing time volume
+			auto SetMusicVolume(float volume) const -> void;
 
-			auto Stop(const std::string& id) -> void {
-				const auto it = musics_.find(id);
-				if (it != musics_.end() && it->second) {
-					it->second->stop();
-					LOG_INFO(log::LogChannel::ENGINE_AUDIO_MUSIC, "Stoping: " + id);
-				}
-			}
+			auto GetMusicVolume() const -> float;
 
-			auto SetVolume(const std::string& id, const float volume) -> void {
-				const auto it = musics_.find(id);
-					if (it != musics_.end() && it->second) {
-						it->second->setVolume(volume);
-						LOG_INFO(log::LogChannel::ENGINE_AUDIO_MUSIC, "Set volume to: " + std::to_string(volume));
-					}
-				}
-
-			auto IsLoaded(const std::string& id) const {
-				if (!musics_.find(id)->second) {
-					return false;
-				}
-				return true;
-			}
+			auto IsLoaded(const std::string& id) const -> bool;
 	};
 }
 

@@ -7,13 +7,13 @@
   Copyright (c) 2025 Romi Brooks, All rights reserved.
 **/
 
-// Standard Libray
+// Standard Library
 #include <ranges>
 
 // Self Dependencies
 #include "SFX.hpp"
-#include "../Log/LogSystem.hpp"
 #include "Manager/SFXManager.hpp"
+#include "../Log/LogSystem.hpp"
 
 namespace engine::audio {
 
@@ -24,13 +24,13 @@ namespace engine::audio {
 
 	auto SFX::Load(const std::string& id, const std::string& filePath) -> bool {
 		// First, load the buffer through SFXManager
-		if (!SFXManager::GetManager().LoadSFXFiles(id, filePath)) {
+		if (!manager::SFXManager::GetManager().LoadSFXFiles(id, filePath)) {
 			LOG_ERROR(log::LogChannel::ENGINE_AUDIO_SFX, "Error when loading SFX: " + id);
 			return false;
 		}
 
 		// Get the buffer from SFXManager
-		const auto buffer = SFXManager::GetManager().GetSFXBuffer(id);
+		const auto buffer = manager::SFXManager::GetManager().GetSFXBuffer(id);
 		if (!buffer) {
 			LOG_ERROR(log::LogChannel::ENGINE_AUDIO_SFX, "Error getting buffer for SFX: " + id);
 			return false;
@@ -41,13 +41,18 @@ namespace engine::audio {
 
 		// Store the sound instance
 		sounds_[id] = std::move(sound);
+
 		return true;
 	}
 
 	auto SFX::Play(const std::string& id) -> void {
 		const auto it = sounds_.find(id);
 		if (it != sounds_.end() && it->second) {
+			// we use Volume Manager class to make sure that audio plays well
+			it->second->setVolume(sfx_volume_);
+
 			it->second->play();
+			LOG_INFO(log::LogChannel::ENGINE_AUDIO_SFX, "Playing: " + id);
 		} else {
 			LOG_WARNING(log::LogChannel::ENGINE_AUDIO_SFX, "SFX not found or not loaded: " + id);
 		}
@@ -75,18 +80,24 @@ namespace engine::audio {
 		}
 	}
 
-	auto SFX::SetGlobalVolume(const float volume) -> void {
-		global_volume_ = volume;
-		auto& instance = GetInstance();
-		for (auto& it : instance.sounds_ | std::views::values) {
-			if (it) {
-				it->setVolume(global_volume_);
-			}
+	auto SFX::Play(const std::string& id, const float volume) -> void {
+		const auto it = sounds_.find(id);
+		if (it != sounds_.end() && it->second) {
+			it->second->setVolume(volume);
+
+			it->second->play();
+			LOG_INFO(log::LogChannel::ENGINE_AUDIO_SFX, "Playing: " + id);
+		} else {
+			LOG_WARNING(log::LogChannel::ENGINE_AUDIO_SFX, "SFX not found or not loaded: " + id);
 		}
 	}
 
-	auto SFX::GetGlobalVolume() -> float {
-		return global_volume_;
+	auto SFX::SetSfxVolume(const float volume) -> void {
+		sfx_volume_ = volume;
+	}
+
+	auto SFX::GetSfxVolume() -> float {
+		return sfx_volume_;
 	}
 
 	auto SFX::IsLoaded(const std::string& id) const -> bool {
@@ -105,4 +116,4 @@ namespace engine::audio {
 	}
 
 	auto SFX::Update() -> void {}
-} // namespace engine::audio
+}

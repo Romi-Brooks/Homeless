@@ -16,11 +16,12 @@ set(IMGUI_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Lib/ImGUI")
 set(IMGUI_SFML_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Lib/ImGUI-SFML")
 set(LUA_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Lib/Lua")
 set(TAGLIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Lib/taglib")
+set(UTFCPP_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Lib/utfcpp")
 
 # ============================================================================
 # 路径检查
 # ============================================================================
-foreach(DIR IN ITEMS ${SFML_DIR} ${IMGUI_DIR} ${IMGUI_SFML_DIR} ${LUA_SRC_DIR} ${TAGLIB_DIR})
+foreach(DIR IN ITEMS ${SFML_DIR} ${IMGUI_DIR} ${IMGUI_SFML_DIR} ${LUA_SRC_DIR} ${TAGLIB_DIR} ${UTFCPP_DIR})
     if(NOT EXISTS ${DIR})
         message(FATAL_ERROR "Required directory not found: ${DIR}")
     endif()
@@ -35,6 +36,7 @@ include_directories(
         ${IMGUI_DIR}
         ${IMGUI_SFML_DIR}
         ${TAGLIB_DIR}/include
+        ${UTFCPP_DIR}
 )
 
 # 链接目录
@@ -43,7 +45,7 @@ link_directories(
         "${TAGLIB_DIR}/lib"
 )
 
-# 1.SFML 聚合库
+# 1. SFML 聚合库
     add_library(sfml_graphics INTERFACE)
     target_link_libraries(sfml_graphics INTERFACE sfml-graphics-d)
     target_include_directories(sfml_graphics INTERFACE ${SFML_DIR}/include)
@@ -68,7 +70,7 @@ link_directories(
             sfml_audio
     )
 
-# 2.Lua 库
+# 2. Lua 库
     file(GLOB LUA_SOURCES
             ${LUA_SRC_DIR}/*.c
     )
@@ -78,7 +80,7 @@ link_directories(
     add_library(lua_lib STATIC ${LUA_SOURCES})
     target_include_directories(lua_lib PUBLIC ${LUA_SRC_DIR})
 
-# 3.ImGui 库
+# 3. ImGui 库
     add_library(imgui_lib STATIC
             "${IMGUI_DIR}/imgui.cpp"
             "${IMGUI_DIR}/imgui_draw.cpp"
@@ -87,18 +89,15 @@ link_directories(
     )
     target_include_directories(imgui_lib PUBLIC ${IMGUI_DIR})
 
-# 4.ImGui-SFML 库
+# 4. ImGui-SFML 库
     add_library(imgui_sfml_lib STATIC
             "${IMGUI_SFML_DIR}/imgui-SFML.cpp"
     )
     target_include_directories(imgui_sfml_lib PUBLIC ${IMGUI_SFML_DIR})
     target_link_libraries(imgui_sfml_lib PUBLIC imgui_lib sfml_all)
 
-# 5.TagLib 库
-    # 检查头文件目录
+# 5. TagLib 库
     set(TAGLIB_INCLUDE_DIR "${TAGLIB_DIR}/include")
-    include_directories(${TAGLIB_INCLUDE_DIR})
-
     # Set .a static lib
     set(TAGLIB_LIB_FILE "${TAGLIB_DIR}/lib/libtag.a")
 
@@ -110,11 +109,17 @@ link_directories(
             INTERFACE_COMPILE_DEFINITIONS "TAGLIB_STATIC"  # 强制定义静态库宏
     )
 
+# 6. utfcpp 库
+    add_library(utfcpp INTERFACE)  # 用 INTERFACE 库封装头文件路径
+    target_include_directories(utfcpp INTERFACE
+            ${UTFCPP_DIR}/source  # 确保能找到 utf8.h 等头文件
+    )
 # ============================================================================
 # 引擎库 For Engine
 # ============================================================================
 
-# 1. 日志库（先编译，其他库依赖它）
+# 1. 日志库
+# Dependency Lib
 add_library(engine_log STATIC
         Engine/Log/LogSystem.cpp
         Engine/Log/LogSystem.hpp
@@ -123,16 +128,16 @@ target_include_directories(engine_log PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Engine)
 
 # 2. 实体库
 add_library(engine_entities STATIC
-        Engine/Entities/Entity.cpp
-        Engine/Entities/Entity.hpp
-        Engine/Entities/NPC.cpp
-        Engine/Entities/NPC.hpp
-        Engine/Entities/Player.cpp
-        Engine/Entities/Player.hpp
+        Engine/Components/Entities/Entity.cpp
+        Engine/Components/Entities/Entity.hpp
+        Engine/Components/Entities/NPC.cpp
+        Engine/Components/Entities/NPC.hpp
+        Engine/Components/Entities/Player.cpp
+        Engine/Components/Entities/Player.hpp
 )
-# 实体库暂无外部依赖，仅需头文件
+# Dependency: None
 
-# 3. 音频库（关键：链接sfml_audio和engine_log）
+# 3. 音频库
 add_library(engine_audio STATIC
         Engine/Audio/Metadata/MetadataReader.cpp
         Engine/Audio/Metadata/MetadataReader.hpp
@@ -146,28 +151,33 @@ add_library(engine_audio STATIC
         Engine/Audio/Music.hpp
         Engine/Audio/SFX.cpp
         Engine/Audio/SFX.hpp
+        Engine/Audio/PlayBox.cpp
+        Engine/Audio/PlayBox.hpp
 )
 target_include_directories(engine_audio PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Engine)
-# 音频库依赖：SFML音频模块 + 日志系统（SFX/Music用LOG_*函数）
+# Dependency: sfml + log
 target_link_libraries(engine_audio PUBLIC sfml_all engine_log)
 
 # 4. 工具库
 add_library(engine_utilities STATIC
         Engine/Utilities/Random/Random.cpp
         Engine/Utilities/Random/Random.hpp
-        Engine/Utilities/Packager/Unpackage.cpp
-        Engine/Utilities/Packager/Unpackage.hpp
-        Engine/Utilities/Packager/Package.hpp
-        Engine/Utilities/Packager/Package.cpp
+        Engine/FileSystem/Packager/Unpackage.cpp
+        Engine/FileSystem/Packager/Unpackage.hpp
+        Engine/FileSystem/Packager/Package.hpp
+        Engine/FileSystem/Packager/Package.cpp
 )
+# Dependency: utfcpp
+target_link_libraries(engine_utilities PUBLIC utfcpp)
 
 # 5. 文件系统库
 add_library(engine_filesystem STATIC
-        Engine/FileSystem/Encoder.cpp
-        Engine/FileSystem/Encoder.hpp
+        Engine/FileSystem/Encoder/Encoder.cpp
+        Engine/FileSystem/Encoder/Encoder.hpp
 )
+# Dependency: None
 
-# 6. 窗口管理库（依赖SFML）
+# 6. 窗口管理库
 add_library(engine_windows STATIC
         Engine/Windows/RenderWindow.cpp
         Engine/Windows/RenderWindow.hpp
@@ -176,9 +186,17 @@ add_library(engine_windows STATIC
         Engine/Windows/Manager/ScreenManager.cpp
         Engine/Windows/Manager/ScreenManager.hpp
 )
-target_link_libraries(engine_windows PUBLIC sfml_all)  # 窗口依赖SFML
+# Dependency: sfml
+target_link_libraries(engine_windows PUBLIC sfml_all)
 
-# 7. Lua绑定库（关键：链接engine_audio，获取SFX/SFXManager实现）
+# 7. 窗口管理库
+add_library(engine_ui STATIC
+        Engine/UI/Components/Text/ClickableText.cpp
+        Engine/UI/Components/Text/ClickableText.hpp
+)
+target_link_libraries(engine_windows PUBLIC sfml_all)
+
+# 8. Lua绑定库（关键：链接engine_audio，获取SFX/SFXManager实现）
 add_library(engine_lua STATIC
         Engine/Lua/LuaLoader.hpp
         Engine/Lua/LuaLoader.cpp
@@ -187,19 +205,28 @@ add_library(engine_lua STATIC
         Engine/Lua/LuaBinding/LuaEntity.cpp
 )
 target_include_directories(engine_lua PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Engine)
-# Lua库依赖：基础lua_lib + 音频库（LuaSFX/LuaMusic调用engine_audio） + 实体库（LuaEntity调用）
+# Dependency: sfml, engine.entity
 target_link_libraries(engine_lua PUBLIC lua_lib engine_audio engine_entities)
 
-# 8. 生成器库
+# 9. 生成器库
 add_library(engine_generation STATIC
         Engine/Actions/Generation/NPCGenerator.cpp
         Engine/Actions/Generation/NPCGenerator.hpp
         Engine/Actions/Generation/PlayerGenerator.cpp
         Engine/Actions/Generation/PlayerGenerator.hpp
 )
-target_link_libraries(engine_generation PUBLIC engine_entities)  # 生成实体依赖实体库
+# Dependency: engine.entity
+target_link_libraries(engine_generation PUBLIC engine_entities)
 
-# 9. 主引擎库（聚合所有引擎组件，依赖顺序无关）
+# 10. 配置库
+add_library(engine_config STATIC
+        Engine/Config/Components/Entities/NPC.hpp
+        Engine/Config/Movement/MoveEvent.hpp
+)
+# Dependency: engine.entity
+target_link_libraries(engine_config PUBLIC engine_entities)
+
+# 11. 主引擎库（聚合所有引擎组件，依赖顺序无关）
 add_library(engine_core INTERFACE)
 target_link_libraries(engine_core INTERFACE
         engine_entities
@@ -210,6 +237,8 @@ target_link_libraries(engine_core INTERFACE
         engine_log
         engine_lua
         engine_generation
+        engine_config
+        engine_ui
 )
 # ============================================================================
 # 游戏库 For Game
@@ -222,6 +251,9 @@ add_library(game_stage STATIC
         Game/Stage/Start.hpp
         Game/Stage/HUD.cpp
         Game/Stage/HUD.hpp
+        Game/Stage/Setting.cpp
+        Game/Stage/Setting.hpp
+
 )
 target_link_libraries(game_stage PUBLIC engine_windows imgui_sfml_lib)  # HUD可能用ImGui
 
@@ -232,6 +264,14 @@ add_library(game_npc STATIC
 )
 target_link_libraries(game_npc PUBLIC engine_entities)
 
+
+# 3. 游戏脚本加载
+add_library(game_script STATIC
+        Game/Script/Native/LoadMusic.cpp
+        Game/Script/Native/LoadMusic.hpp
+)
+target_link_libraries(game_script PUBLIC engine_audio)
+
 # 3. 配置库（仅头文件，无需链接）
 add_library(game_config INTERFACE)
 
@@ -241,6 +281,7 @@ target_link_libraries(game_core INTERFACE
         game_stage
         game_npc
         game_config
+        game_script
 )
 
 # ============================================================================
@@ -309,6 +350,7 @@ message(STATUS "ImGui-SFML include path: ${IMGUI_SFML_DIR}")
 message(STATUS "Lua source path: ${LUA_SRC_DIR}")
 message(STATUS "TagLib include path: ${TAGLIB_DIR}/include")
 message(STATUS "TagLib library path: ${TAGLIB_DIR}/lib")
+message(STATUS "utfcpp include path: ${UTFCPP_DIR}")
 
 # 找到的源文件数量
 file(GLOB_RECURSE ALL_SOURCES "*.cpp" "*.c" "*.hpp" "*.h")

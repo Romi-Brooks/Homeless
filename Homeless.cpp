@@ -16,37 +16,41 @@
 
 #include "Engine/Audio/Music.hpp"
 #include "Engine/Audio/SFX.hpp"
+#include "iostream"
 
 #include "Engine/Utilities/Random/Random.hpp"
 
+#include "Engine/FileSystem/Encoder/Encoder.hpp"
 #include "Engine/Windows/Manager/ScreenManager.hpp"
 #include "Engine/Windows/RenderWindow.hpp"
-
-#include "Game/Config/Audios/Music.hpp"
-#include "Game/Config/Audios/SFX.hpp"
+#include "Game/Script/Native/LoadMusic.hpp"
+#include "Game/Stage/Debugger.hpp"
 
 #include "Game/Stage/HUD.hpp"
+#include "Game/Stage/Setting.hpp"
 #include "Game/Stage/Start.hpp"
+#include "Log/LogSystem.hpp"
+
 #include "Lua/LuaLoader.hpp"
-
-
-// Define static member
-float engine::audio::SFX::global_volume_ = 100.0f;
-float engine::audio::Music::global_volume_ = 100.0f;
 
 auto main() -> int {
 	#ifdef _WIN32
 		SetConsoleOutputCP(CP_UTF8);
 	#endif // _WIN32
 
+
 	// RNG
 	GlobalRandom::Init();
 
-	// Lua
+	// Resource loader
+	game::script::native::LoadMusic();
+
+	// Lua loader
 	LuaLoader luaLoader;
 	if (!luaLoader.initialize()) {
 		return -1;
 	}
+
 	const std::string MusicLoader = "Script/LoadMusic.lua";
 	const std::string SFXLoader = "Script/LoadSFX.lua";
 	luaLoader.loadScript(MusicLoader);
@@ -59,18 +63,22 @@ auto main() -> int {
 
 		// Register the screen
 		auto& screenManager = engine::window::manager::ScreenManager::GetInstance();
+		screenManager.LoadScreen("Debugger", std::make_unique<Debugger>());
 		screenManager.LoadScreen("Start", std::make_unique<Start>());
 		screenManager.LoadScreen("HUD", std::make_unique<HUD>());
+		screenManager.LoadScreen("Setting", std::make_unique<Setting>());
 
 		// default screen
 		screenManager.SwitchScreen("Start");
+		engine::window::manager::ScreenManager::GetInstance().PushScreen("Debugger");
+
 
 		// run
 		renderWindow.Run();
 
 		return 0;
 	} catch (const std::exception& e) {
-		LOG_ERROR(engine::log::LogChannel::GAME_MAIN, "Application error.");
+		LOG_ERROR(engine::log::LogChannel::GAME_MAIN, "Application error: " + std::to_string(*e.what()));
 		return -1;
 	}
 }

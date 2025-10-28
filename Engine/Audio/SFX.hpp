@@ -10,12 +10,12 @@
 #ifndef HOMELESS_SFX_HPP
 #define HOMELESS_SFX_HPP
 
-// Standard Libray
+// Standard Library
 #include <memory>
 #include <string>
 #include <unordered_map>
 
-// Third party Libray
+// Third party Library
 #include <SFML/Audio/Sound.hpp>
 #include <SFML/Audio/SoundBuffer.hpp>
 
@@ -26,7 +26,7 @@ namespace engine::audio {
 	        std::unordered_map<std::string, std::unique_ptr<sf::Sound>> sounds_;
 
 	        // Global volume for all sounds
-	        static float global_volume_;
+	        static float sfx_volume_;
 
 	        // Private constructor for singleton
 	        SFX() = default;
@@ -47,17 +47,21 @@ namespace engine::audio {
 
 	        // Stop a specific sound effect
 	        auto Stop(const std::string& id) -> void;
+
 	        // Stop all sound effects
 	        auto StopAll() -> void;
 
-	        // Set volume for a specific sound effect
-	        auto SetVolume(const std::string& id, float volume) -> void;
+    		// Set volume for a specific sound effect
+    		auto SetVolume(const std::string& id, float volume) -> void;
 
-	        // Set global volume for all sound effects
-	        static auto SetGlobalVolume(float volume) -> void;
+    		// Instead, We play a sound effect with special volume
+    		auto Play(const std::string& id, const float volume) -> void;
+
+    		// Volume Manager use this interface to set the playing time volume
+			static auto SetSfxVolume(const float volume) -> void;
 
 	        // Get global volume
-	        static auto GetGlobalVolume() -> float;
+	        static auto GetSfxVolume() -> float ;
 
 	        // Check if a sound effect is loaded
 	        auto IsLoaded(const std::string& id) const -> bool;

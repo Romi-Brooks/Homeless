@@ -10,7 +10,7 @@
 #ifndef HOMELESS_DEADBODY_HPP
 #define HOMELESS_DEADBODY_HPP
 
-#include "../../../Engine/Entities/NPC.hpp"
+#include "../../../Engine/Components/Entities/NPC.hpp"
 #include "../../Config/Entities/NPC.hpp"
 
 

@@ -18,7 +18,7 @@
 #include <SFML/Graphics.hpp>
 
 // Self Dependencies
-#include "../Config/Movement/MoveEvent.hpp"
+#include "../../Config/Movement/MoveEvent.hpp"
 
 using EntityMovement = engine::config::movements::Movement;
 

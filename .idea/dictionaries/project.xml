@@ -1,7 +1,10 @@
 <component name="ProjectDictionaryState">
   <dictionary name="project">
     <words>
+      <w>clickabletext</w>
       <w>imgui</w>
+      <w>lualoader</w>
+      <w>metadatareader</w>
       <w>moveevent</w>
       <w>musicconfig</w>
       <w>musicfade</w>
@@ -12,6 +15,7 @@
       <w>sfxmanager</w>
       <w>startscreen</w>
       <w>transer</w>
+      <w>utfcpp</w>
       <w>volumemanager</w>
       <w>windowsmanager</w>
     </words>

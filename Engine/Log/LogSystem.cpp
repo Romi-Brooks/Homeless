@@ -33,24 +33,32 @@ std::string GetLogLevel(const LogLevel& logLevel) {
 
 std::string GetLogChannel(const LogChannel& channel) {
 	switch (channel) {
-	case LogChannel::ENGINE_PHYSICS_EDGE_DETECT: return "Engine.Physics.EdgeDetect -> ";
-	case LogChannel::ENGINE_CONFIG_MOVEMENT: return "Engine.Movement -> ";
+		case LogChannel::ENGINE_AUDIO_MUSIC: return "Engine.Audio.Music -> ";
+		case LogChannel::ENGINE_AUDIO_SFX: return"Engine.Audio.SFX -> ";
+		case LogChannel::ENGINE_AUDIO_PLUG_MUSIC_FADE: return "Engine.Audio.Music.Fade -> ";
 
-	case LogChannel::ENGINE_AUDIO_MUSIC: return "Engine.Audio.Music -> ";
-	case LogChannel::ENGINE_AUDIO_SFX: return"Engine.Audio.SFX -> ";
-	case LogChannel::ENGINE_AUDIO_PLUG_MUSIC_FADE: return "Engine.Audio.Music.Fade -> ";
+		case LogChannel::ENGINE_CONFIG_MOVEMENT: return "Engine.Movement -> ";
 
-	case LogChannel::ENGINE_WINDOW: return "Engine.Window -> ";
-	case LogChannel::ENGINE_SCREEN: return  "Engine.Screen -> ";
-	case LogChannel::ENGINE_SCREEN_MANAGER: return "Engine.Screen.Manager -> ";
+		case LogChannel::ENGINE_ENTITY:return "Engine.Entity -> ";
+		case LogChannel::ENGINE_ENTITY_NPC: return "Engine.Entity.NPC -> ";
+		case LogChannel::ENGINE_ENTITY_PLAYER: return "Engine.Entity.Player -> ";
 
-	case LogChannel::ENGINE_FILESYSTEM_ENCODER: return "Engine.Filesystem.Encoder -> ";
+		case LogChannel::ENGINE_SCREEN: return  "Engine.Screen -> ";
+		case LogChannel::ENGINE_SCREEN_MANAGER: return "Engine.Screen.Manager -> ";
 
-	case LogChannel::ENGINE_GAME_NPC: return "Game.NPC -> ";
-	case LogChannel::ENGINE_GAME_PLAYER: return "Game.Player -> ";
-	case LogChannel::ENGINE_GAME_SCREEN: return "Game.Screen -> ";
+		case LogChannel::ENGINE_WINDOW: return "Engine.Window -> ";
 
-	case LogChannel::GAME_MAIN: return "Game.Main -> ";
+		case LogChannel::ENGINE_PHYSICS_EDGE_DETECT: return "Engine.Physics.EdgeDetect -> ";
+
+		case LogChannel::ENGINE_FILESYSTEM_ENCODER: return "Engine.Filesystem.Encoder -> ";
+
+		case LogChannel::ENGINE_LUA: return "Engine.Lua -> ";
+
+		case LogChannel::GAME_NPC: return "Game.NPC -> ";
+		case LogChannel::GAME_PLAYER: return "Game.Player -> ";
+		case LogChannel::GAME_SCREEN: return "Game.Screen -> ";
+
+		case LogChannel::GAME_MAIN: return "Game.Main -> ";
 	}
 	return "Call func with error channel.";
 }

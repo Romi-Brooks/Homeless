@@ -10,11 +10,20 @@
 #ifndef HOMELESS_VOLUMEMANAGER_HPP
 #define HOMELESS_VOLUMEMANAGER_HPP
 
-namespace engine::audio {
+namespace engine::audio::manager {
 	class VolumeManager {
 		private:
+			VolumeManager() = default;
 
 		public:
+
+			static auto SetSfxVolume(float volume) -> void;
+
+			static auto GetSfxVolume() -> float;
+
+			static auto SetMusicVolume(float volume) -> void;
+
+			static auto GetMusicVolume() -> float;
 
 	};
 }

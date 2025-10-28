@@ -16,7 +16,7 @@
 
 // Self Dependencies
 #include "Entity.hpp"
-#include "../Config/Movement/MoveEvent.hpp"
+#include "../../Config/Movement/MoveEvent.hpp"
 
 using PlayerMovement = engine::config::movements::Movement;
 

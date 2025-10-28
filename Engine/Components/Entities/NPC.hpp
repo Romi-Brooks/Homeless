@@ -12,9 +12,9 @@
 
 // Self Dependencies
 #include "Entity.hpp"
-#include "../Config/Entities/NPC.hpp"
-#include "../Config/Movement/MoveEvent.hpp"
-#include "../Log/LogSystem.hpp"
+#include "../../Config/Components/Entities/NPC.hpp"
+#include "../../Config/Movement/MoveEvent.hpp"
+#include "../../Log/LogSystem.hpp"
 
 enum class NPCName;
 

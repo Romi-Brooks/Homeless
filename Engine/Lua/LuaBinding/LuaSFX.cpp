@@ -7,14 +7,18 @@
   Copyright (c) 2025 Romi Brooks, All rights reserved.
 **/
 
+#include <string>
+
+#include "lua.hpp"
+
+#include "Log/LogSystem.hpp"
 #include "../../Audio/Manager/SFXManager.hpp"
 #include "../../Audio/SFX.hpp"
-#include "lua.hpp"
-#include <iostream>
+
 
 #define GET_SFX() (engine::audio::SFX::GetInstance())
 
-#define GET_SFX_MANAGER() (engine::audio::SFXManager::GetManager())
+#define GET_SFX_MANAGER() (engine::audio::manager::SFXManager::GetManager())
 
 static int lua_SFX_Load(lua_State* L) {
     const char* sfx_id = luaL_checkstring(L, 1);
@@ -53,12 +57,12 @@ static int lua_SFX_SetVolume(lua_State* L) {
 
 static int lua_SFX_SetGlobalVolume(lua_State* L) {
     float global_volume = static_cast<float>(luaL_checknumber(L, 1));
-    engine::audio::SFX::SetGlobalVolume(global_volume); // 调用静态方法
+    engine::audio::SFX::SetSfxVolume(global_volume); // 调用静态方法
     return 0;
 }
 
 static int lua_SFX_GetGlobalVolume(lua_State* L) {
-    float current_volume = engine::audio::SFX::GetGlobalVolume();
+    float current_volume = engine::audio::SFX::GetSfxVolume();
     lua_pushnumber(L, current_volume);
     return 1;
 }
@@ -143,5 +147,5 @@ void registerSFXToLua(lua_State* L) {
     luaL_setfuncs(L, sfx_manager_method_list, 0);
     lua_setglobal(L, "SFXManager");
 
-    std::cout << "[Lua Binding] SFX and SFXManager registered successfully." << std::endl;
+	LOG_INFO(engine::log::LogChannel::ENGINE_LUA, "Engine.Audio.SFX and Engine.Audio.SFXManager registered successfully.");
 }
