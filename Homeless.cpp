@@ -13,31 +13,42 @@
 #endif // _WIN32
 
 #include <thread>
+#include <iostream>
+
 
 #include "Engine/Audio/Music.hpp"
 #include "Engine/Audio/SFX.hpp"
-#include "iostream"
 
 #include "Engine/Utilities/Random/Random.hpp"
 
+#include "Engine/Components/Entities/Player.hpp"
+
+#include "Engine/Tools/Packager/Packager.hpp"
+#include "Engine/Tools/Packager/Unpackager.hpp"
+
 #include "Engine/FileSystem/Encoder/Encoder.hpp"
+
 #include "Engine/Windows/Manager/ScreenManager.hpp"
 #include "Engine/Windows/RenderWindow.hpp"
-#include "Game/Script/Native/LoadMusic.hpp"
-#include "Game/Stage/Debugger.hpp"
 
+#include "Engine/Lua/LuaLoader.hpp"
+
+#include "Game/Script/Native/LoadMusic.hpp"
+
+#include "Game/Stage/Debugger.hpp"
 #include "Game/Stage/HUD.hpp"
 #include "Game/Stage/Setting.hpp"
 #include "Game/Stage/Start.hpp"
+
 #include "Log/LogSystem.hpp"
 
-#include "Lua/LuaLoader.hpp"
+
+
 
 auto main() -> int {
 	#ifdef _WIN32
 		SetConsoleOutputCP(CP_UTF8);
 	#endif // _WIN32
-
 
 	// RNG
 	GlobalRandom::Init();

@@ -2,6 +2,7 @@
   <dictionary name="project">
     <words>
       <w>clickabletext</w>
+      <w>hpkg</w>
       <w>imgui</w>
       <w>lualoader</w>
       <w>metadatareader</w>

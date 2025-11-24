@@ -11,16 +11,16 @@
 #ifndef HOMELESS_ENTITY_HPP
 #define HOMELESS_ENTITY_HPP
 
-// Standard Libray
+// Standard Library
 #include <memory>
 
-// Third party Libray
+// Third party Library
 #include <SFML/Graphics.hpp>
 
 // Self Dependencies
 #include "../../Config/Movement/MoveEvent.hpp"
 
-using EntityMovement = engine::config::movements::Movement;
+using engine::config::movements::Movement;
 
 namespace engine::entity {
 	class Entity {
@@ -76,7 +76,7 @@ namespace engine::entity {
 				return true;
 			}
 
-			virtual auto Move(const EntityMovement Signal) const -> void {
+			virtual auto Move(const Movement Signal) const -> void {
 					// should give to subclass
 			}
 

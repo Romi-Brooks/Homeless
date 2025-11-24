@@ -15,7 +15,7 @@
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Font.hpp>
 
-namespace engine::ui {
+namespace engine::ui::components {
 	class ClickableText {
 		public:
 			ClickableText(std::string text);

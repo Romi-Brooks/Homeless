@@ -114,6 +114,7 @@ link_directories(
     target_include_directories(utfcpp INTERFACE
             ${UTFCPP_DIR}/source  # 确保能找到 utf8.h 等头文件
     )
+
 # ============================================================================
 # 引擎库 For Engine
 # ============================================================================
@@ -158,26 +159,34 @@ target_include_directories(engine_audio PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Engin
 # Dependency: sfml + log
 target_link_libraries(engine_audio PUBLIC sfml_all engine_log)
 
-# 4. 工具库
+# 4. 实用工具库
 add_library(engine_utilities STATIC
         Engine/Utilities/Random/Random.cpp
         Engine/Utilities/Random/Random.hpp
-        Engine/FileSystem/Packager/Unpackage.cpp
-        Engine/FileSystem/Packager/Unpackage.hpp
-        Engine/FileSystem/Packager/Package.hpp
-        Engine/FileSystem/Packager/Package.cpp
 )
 # Dependency: utfcpp
-target_link_libraries(engine_utilities PUBLIC utfcpp)
+target_link_libraries(engine_utilities PUBLIC)
 
-# 5. 文件系统库
+# 5. 引擎分离工具库
+add_library(engine_tools STATIC
+        Engine/Tools/Packager/Unpackager.cpp
+        Engine/Tools/Packager/Unpackager.hpp
+        Engine/Tools/Packager/Packager.cpp
+        Engine/Tools/Packager/Packager.hpp
+)
+target_include_directories(engine_tools PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/Engine/Tools/Packager  # Packager目录
+)
+target_link_libraries(engine_tools PUBLIC utfcpp)
+
+# 6. 文件系统库
 add_library(engine_filesystem STATIC
         Engine/FileSystem/Encoder/Encoder.cpp
         Engine/FileSystem/Encoder/Encoder.hpp
 )
 # Dependency: None
 
-# 6. 窗口管理库
+# 7. 窗口管理库
 add_library(engine_windows STATIC
         Engine/Windows/RenderWindow.cpp
         Engine/Windows/RenderWindow.hpp
@@ -189,14 +198,20 @@ add_library(engine_windows STATIC
 # Dependency: sfml
 target_link_libraries(engine_windows PUBLIC sfml_all)
 
-# 7. 窗口管理库
+# 8. 窗口管理库
 add_library(engine_ui STATIC
         Engine/UI/Components/Text/ClickableText.cpp
         Engine/UI/Components/Text/ClickableText.hpp
+        Engine/UI/Layout/Centre.cpp
+        Engine/UI/Layout/Centre.hpp
+        Engine/UI/Layout/Left.cpp
+        Engine/UI/Layout/Left.hpp
+        Engine/UI/Layout/Right.cpp
+        Engine/UI/Layout/Right.hpp
 )
 target_link_libraries(engine_windows PUBLIC sfml_all)
 
-# 8. Lua绑定库（关键：链接engine_audio，获取SFX/SFXManager实现）
+# 9. Lua绑定库（关键：链接engine_audio，获取SFX/SFXManager实现）
 add_library(engine_lua STATIC
         Engine/Lua/LuaLoader.hpp
         Engine/Lua/LuaLoader.cpp
@@ -208,7 +223,7 @@ target_include_directories(engine_lua PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Engine)
 # Dependency: sfml, engine.entity
 target_link_libraries(engine_lua PUBLIC lua_lib engine_audio engine_entities)
 
-# 9. 生成器库
+# 10. 生成器库
 add_library(engine_generation STATIC
         Engine/Actions/Generation/NPCGenerator.cpp
         Engine/Actions/Generation/NPCGenerator.hpp
@@ -218,7 +233,7 @@ add_library(engine_generation STATIC
 # Dependency: engine.entity
 target_link_libraries(engine_generation PUBLIC engine_entities)
 
-# 10. 配置库
+# 11. 配置库
 add_library(engine_config STATIC
         Engine/Config/Components/Entities/NPC.hpp
         Engine/Config/Movement/MoveEvent.hpp
@@ -226,12 +241,13 @@ add_library(engine_config STATIC
 # Dependency: engine.entity
 target_link_libraries(engine_config PUBLIC engine_entities)
 
-# 11. 主引擎库（聚合所有引擎组件，依赖顺序无关）
+# 12. 主引擎库（聚合所有引擎组件，依赖顺序无关）
 add_library(engine_core INTERFACE)
 target_link_libraries(engine_core INTERFACE
         engine_entities
         engine_audio
         engine_utilities
+        engine_tools
         engine_filesystem
         engine_windows
         engine_log
@@ -240,6 +256,7 @@ target_link_libraries(engine_core INTERFACE
         engine_config
         engine_ui
 )
+
 # ============================================================================
 # 游戏库 For Game
 # ============================================================================
@@ -305,6 +322,16 @@ endif()
 if(WIN32)
     target_link_libraries(Homeless PRIVATE opengl32 gdi32)  # OpenGL和GDI依赖
 endif()
+
+
+# ============================================================================
+# 引擎单独工具
+# ============================================================================
+add_executable(packager_tool
+        Engine/Tools/Packager/Package_main.cpp
+)
+# 工具同样链接公共库，复用Unpackager
+target_link_libraries(packager_tool PRIVATE engine_tools)
 
 # ============================================================================
 # 平台特定配置
