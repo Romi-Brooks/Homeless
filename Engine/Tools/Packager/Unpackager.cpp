@@ -1,7 +1,9 @@
 #include <iostream>
-#include "utf8.h"
+#include <utf8.h>
 
 #include "Unpackager.hpp"
+
+namespace fs = std::filesystem;
 
 namespace engine::tools::unpackage {
 	Unpackager::Config::Config() : verbose(false), preserveStructure(true), overwrite(true), outputDir(".") {}
@@ -18,14 +20,12 @@ namespace engine::tools::unpackage {
 	    return {data.begin(), data.end()};
 	}
 
-	// ==================== 析构函数实现 ====================
 	Unpackager::~Unpackager() {
 	    if (package_stream_.is_open()) {
 	        package_stream_.close();
 	    }
 	}
 
-	// ==================== 移动构造和移动赋值实现 ====================
 	Unpackager::Unpackager(Unpackager&& other) noexcept
 	    : file_table_(std::move(other.file_table_))
 	    , file_index_(std::move(other.file_index_))

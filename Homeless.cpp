@@ -15,35 +15,17 @@
 #include <thread>
 #include <iostream>
 
+#include <Utilities/Random/Random.hpp>
+#include <Windows/Manager/ScreenManager.hpp>
+#include <Lua/LuaLoader.hpp>
+#include <Log/LogSystem.hpp>
 
-#include "Engine/Audio/Music.hpp"
-#include "Engine/Audio/SFX.hpp"
-
-#include "Engine/Utilities/Random/Random.hpp"
-
-#include "Engine/Components/Entities/Player.hpp"
-
-#include "Engine/Tools/Packager/Packager.hpp"
-#include "Engine/Tools/Packager/Unpackager.hpp"
-
-#include "Engine/FileSystem/Encoder/Encoder.hpp"
-
-#include "Engine/Windows/Manager/ScreenManager.hpp"
-#include "Engine/Windows/RenderWindow.hpp"
-
-#include "Engine/Lua/LuaLoader.hpp"
-
-#include "Game/Script/Native/LoadMusic.hpp"
+#include "Game/Script/Native/Audio/AudioLoader.hpp"
 
 #include "Game/Stage/Debugger.hpp"
 #include "Game/Stage/HUD.hpp"
 #include "Game/Stage/Setting.hpp"
 #include "Game/Stage/Start.hpp"
-
-#include "Log/LogSystem.hpp"
-
-
-
 
 auto main() -> int {
 	#ifdef _WIN32
@@ -54,7 +36,7 @@ auto main() -> int {
 	GlobalRandom::Init();
 
 	// Resource loader
-	game::script::native::LoadMusic();
+	game::script::audio::LoadAudios();
 
 	// Lua loader
 	LuaLoader luaLoader;

@@ -3,47 +3,49 @@
 
 #include <string>
 
-#include "../Entities/NPC.hpp"
-#include "../../Engine/Config/Entities/NPC.hpp"
+#include <Components/Entities/Entity.hpp>
+#include <Config/Components/Entities/NPC.hpp>
+
+#include "../Game/Config/Entities/NPC.hpp"
 
 namespace hl_trans {
-	inline auto GetNPCName(const hl_npc::NPCName name) -> std::string {
+	inline auto GetNPCName(const game::config::hl_npc::NPCName name) -> std::string {
 		switch (name) {
-		case hl_npc::NPCName::NPC_DeadBody: {
-			return "NPC_Dead_Body";
-		}
-		default: {
-			return "";
-		}
+			case game::config::hl_npc::NPCName::NPC_DeadBody: {
+				return "NPC_Dead_Body";
+			}
+			default: {
+				return "";
+			}
 		}
 	}
-	inline auto GetNPCType(const engine::npc_property::NPCType type) -> std::string {
+	inline auto GetNPCType(const engine::config::npc_property::NPCType type) -> std::string {
 		switch (type) {
-		case engine::npc_property::NPCType::NPC_Negative: {
-			return "NPC_Negative";
-		}
-		case engine::npc_property::NPCType::NPC_Neutral: {
-			return "NPC_Neutral";
-		}
-		case engine::npc_property::NPCType::NPC_Positive: {
-			return "NPC_Positive";
-		}
-		default: {
-			return "";
-		}
+			case engine::config::npc_property::NPCType::NPC_Negative: {
+				return "NPC_Negative";
+			}
+			case engine::config::npc_property::NPCType::NPC_Neutral: {
+				return "NPC_Neutral";
+			}
+			case engine::config::npc_property::NPCType::NPC_Positive: {
+				return "NPC_Positive";
+			}
+			default: {
+				return "";
+			}
 		}
 	}
-	inline auto GetNPCKillable(const engine::npc_property::NPCKillable killable) -> std::string {
+	inline auto GetNPCKillable(const engine::config::npc_property::NPCKillable killable) -> std::string {
 		switch (killable) {
-		case engine::npc_property::NPCKillable::NPC_Killable: {
-			return "NPC_Killable";
-		}
-		case engine::npc_property::NPCKillable::NPC_Unkillable: {
-			return "NPC_UnKillable";
-		}
-		default: {
-			return "";
-		}
+			case engine::config::npc_property::NPCKillable::NPC_Killable: {
+				return "NPC_Killable";
+			}
+			case engine::config::npc_property::NPCKillable::NPC_Unkillable: {
+				return "NPC_UnKillable";
+			}
+			default: {
+				return "";
+			}
 		}
 	}
 }

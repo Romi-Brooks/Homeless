@@ -55,10 +55,10 @@ namespace engine::audio {
     		auto SetVolume(const std::string& id, float volume) -> void;
 
     		// Instead, We play a sound effect with special volume
-    		auto Play(const std::string& id, const float volume) -> void;
+    		auto Play(const std::string& id, float volume) -> void;
 
     		// Volume Manager use this interface to set the playing time volume
-			static auto SetSfxVolume(const float volume) -> void;
+			static auto SetSfxVolume(float volume) -> void;
 
 	        // Get global volume
 	        static auto GetSfxVolume() -> float ;

@@ -11,10 +11,9 @@
 
 #include <string>
 
-#include "Audio/Music.hpp"
-
 namespace hl_music {
-	inline std::string Background_1 = "Media/Musics/Background.mp3";
+	inline std::string native_background_1 = "Media/Musics/Background.mp3";
+	inline std::string native_background_2 = "Media/Musics/汪苏泷,By2 - 有点甜.mp3";
 }
 
 #endif // HOMELESS_MUSICCONFIG_HPP

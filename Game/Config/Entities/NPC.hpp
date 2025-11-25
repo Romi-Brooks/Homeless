@@ -5,7 +5,7 @@
 // However, we also provide native C++ versions and Lua hot-loading versions
 // Ensuring maximum flexibility for modifying game content
 
-namespace hl_npc {
+namespace game::config::hl_npc {
 	enum class NPCName {
 		NPC_DeadBody,
 		NPC_FatNinja,

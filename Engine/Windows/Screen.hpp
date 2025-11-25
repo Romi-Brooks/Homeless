@@ -17,12 +17,12 @@ namespace engine::window::screen{
 		public:
 			virtual ~Screen() = default;
 
-			virtual void Render(sf::RenderWindow& window) = 0;
-			virtual bool HandleEvent(const sf::Event& event) = 0;	// Use Boolean return values to ensure events are handled correctly.
-			virtual void Update(float deltaTime) = 0;
+			virtual auto Render(sf::RenderWindow& window) -> void = 0;
+			virtual auto HandleEvent(const sf::Event& event) -> bool = 0;	// Use Boolean return values to ensure events are handled correctly.
+			virtual auto Update(float deltaTime) -> void = 0;
 
-			virtual void OnActivate() {}    // When active
-			virtual void OnDeactivate() {}  // When switch out
+			virtual auto OnActivate() -> void {}    // When active
+			virtual auto OnDeactivate() -> void {}  // When switch out
 	};
 }
 

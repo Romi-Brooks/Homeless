@@ -25,23 +25,23 @@ namespace engine::audio::metadata {
 				return instance;
 			}
 
-			auto GetSongTitle(const Music& music) const -> std::string;
+			[[nodiscard]] auto GetSongTitle(const Music& music) const -> std::string;
 
-			auto GetSongProducer(const Music& music) const -> std::string;
+			[[nodiscard]] auto GetSongProducer(const Music& music) const -> std::string;
 
-			auto GetAlbumCover(const Music& music) const -> std::vector<unsigned char>;
+			[[nodiscard]] auto GetAlbumCover(const Music& music) const -> std::vector<unsigned char>;
 
 		private:
 			MetadataReader() = default;
 
-			auto IsMP3(const std::string& filePath) const -> bool;
+			[[nodiscard]] auto IsMP3(const std::string& filePath) const -> bool;
 
-			auto IsWAV(const std::string& filePath) const -> bool;
+			[[nodiscard]] auto IsWAV(const std::string& filePath) const -> bool;
 
 			// for wav file, public api use this function
-			auto getWAVTitle(const std::string& filePath) const -> std::string;
+			[[nodiscard]] auto getWAVTitle(const std::string& filePath) const -> std::string;
 
-			auto getWAVProducer(const std::string& filePath) const -> std::string;
+			[[nodiscard]] auto getWAVProducer(const std::string& filePath) const -> std::string;
 	};
 }
 

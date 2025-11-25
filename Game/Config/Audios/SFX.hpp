@@ -13,8 +13,7 @@
 #include <string>
 
 namespace hl_sfx {
-	inline std::string Kick = "Media/SFXS/KSHMR_Punchy_Kick_20_F.wav";
-	inline std::string Snare = "Media/SFXS/KSHMR_Tight_Snare_21_E.wav";
-
+	inline std::string native_kick_1 = "Media/SFXS/KSHMR_Punchy_Kick_20_F.wav";
+	inline std::string native_snare_1 = "Media/SFXS/KSHMR_Tight_Snare_21_E.wav";
 }
 #endif // HOMELESS_SFXCONFIG_HPP

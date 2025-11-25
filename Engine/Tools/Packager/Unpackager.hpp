@@ -8,8 +8,6 @@
 #include <unordered_map>
 #include <memory>
 
-namespace fs = std::filesystem;
-
 namespace engine::tools::unpackage {
 	class Unpackager final {
 		public:
@@ -89,8 +87,8 @@ namespace engine::tools::unpackage {
 		    static constexpr uint16_t VERSION = 1;
 
 		    // 私有工具函数
-		    bool CreateDirectory(const fs::path& dir_path);
-		    std::string SafePathToString(const fs::path& path);
+		    bool CreateDirectory(const std::filesystem::path& dir_path);
+		    std::string SafePathToString(const std::filesystem::path& path);
 		    uint64_t GetFileSize(const std::string& filename);
 		    Result ReadFileData(const FileEntry& entry, std::vector<char>& buffer);
 		};

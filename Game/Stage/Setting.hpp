@@ -10,14 +10,15 @@
 #ifndef HOMELESS_SETTING_HPP
 #define HOMELESS_SETTING_HPP
 
-#include <imgui.h>
-#include <imgui-SFML.h>
-
-#include <SFML/Graphics.hpp>
 #include <vector>
 
-#include "../../Engine/Log/LogSystem.hpp"
-#include "../../Engine/Windows/Manager/ScreenManager.hpp"
+#include <imgui.h>
+#include <imgui-SFML.h>
+#include <SFML/Graphics.hpp>
+
+#include <Log/LogSystem.hpp>
+#include <Windows/Manager/ScreenManager.hpp>
+#include <Windows/RenderWindow.hpp>
 
 class Setting : public engine::window::screen::Screen {
 	private:
@@ -55,8 +56,8 @@ class Setting : public engine::window::screen::Screen {
 			}
 		}
 
-		void UpdateScaleFactor(sf::RenderWindow& window) {
-			sf::Vector2u newSize = window.getSize();
+		void UpdateScaleFactor(const sf::RenderWindow& window) {
+			const sf::Vector2u newSize = window.getSize();
 
 			// 仅在窗口大小实际改变时才更新
 			if (newSize != windowSize) {
@@ -66,14 +67,14 @@ class Setting : public engine::window::screen::Screen {
 		}
 
 		// 左对齐布局实现，基于窗口比例
-		void UpdateMenuPositions(sf::RenderWindow& window) {
+		void UpdateMenuPositions(const sf::RenderWindow& window) {
 			// 首先更新窗口大小
 			UpdateScaleFactor(window);
 
 			// 计算实际边距和间距（基于窗口比例）
-			float marginLeft = marginLeftRatio * windowSize.x;
-			float lineSpacing = lineSpacingRatio * windowSize.y;
-			unsigned int fontSize = static_cast<unsigned int>(baseFontSizeRatio * windowSize.y);
+			const float marginLeft = marginLeftRatio * windowSize.x;
+			const float lineSpacing = lineSpacingRatio * windowSize.y;
+			const unsigned int fontSize = static_cast<unsigned int>(baseFontSizeRatio * windowSize.y);
 
 			// 菜单起始Y坐标（垂直方向1/3处）
 			const float startY = windowSize.y / 3.0f;
@@ -105,7 +106,7 @@ public:
 		InitMenuItems();
 	}
 
-	void Render(sf::RenderWindow& window) override {
+	auto Render(sf::RenderWindow& window) -> void override {
 		// 确保窗口大小被正确初始化
 		if (windowSize.x == 0 || windowSize.y == 0) {
 			windowSize = window.getSize();
@@ -119,7 +120,7 @@ public:
 		}
 	}
 
-	bool HandleEvent(const sf::Event& event) override {
+	auto HandleEvent(const sf::Event& event)-> bool override {
 		// 鼠标移动事件：只在鼠标悬停在菜单项上时处理，但不消费（允许下层屏幕也响应移动）
 		if (const auto* mouseMoved = event.getIf<sf::Event::MouseMoved>()) {
 			const sf::Vector2f mousePos(
@@ -146,14 +147,18 @@ public:
 				if (menuItems[i].getGlobalBounds().contains(mousePos)) {
 					// 执行对应逻辑（如New Game、Exit等）
 					switch (i) {
-					case 0: break;
-					case 1: break;
-					case 2: break;
-					case 3: {
-						engine::window::manager::ScreenManager::GetInstance().SwitchScreen("Start");
-						engine::window::manager::ScreenManager::GetInstance().PushScreen("Debugger");
-						break;
-					}
+						case 0: {
+							engine::window::RenderWindow::GetInstance().SetFPS(120);
+							break;
+						}
+						case 1: break;
+						case 2: break;
+						case 3: {
+							engine::window::manager::ScreenManager::GetInstance().SwitchScreen("Start");
+							engine::window::manager::ScreenManager::GetInstance().PushScreen("Debugger");
+							break;
+						}
+						default: {};
 					}
 					return true; // 消费点击事件，下层不再处理
 				}
@@ -165,7 +170,7 @@ public:
 		return false;
 	}
 
-	void Update(float deltaTime) override {
+	auto Update(float deltaTime)-> void override {
 
 	}
 };

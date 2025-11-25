@@ -152,8 +152,6 @@ add_library(engine_audio STATIC
         Engine/Audio/Music.hpp
         Engine/Audio/SFX.cpp
         Engine/Audio/SFX.hpp
-        Engine/Audio/PlayBox.cpp
-        Engine/Audio/PlayBox.hpp
 )
 target_include_directories(engine_audio PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Engine)
 # Dependency: sfml + log
@@ -270,27 +268,34 @@ add_library(game_stage STATIC
         Game/Stage/HUD.hpp
         Game/Stage/Setting.cpp
         Game/Stage/Setting.hpp
-
 )
-target_link_libraries(game_stage PUBLIC engine_windows imgui_sfml_lib)  # HUD可能用ImGui
+target_link_libraries(game_stage PUBLIC engine_core imgui_sfml_lib)  # HUD可能用ImGui
 
 # 2. NPC实体库（依赖引擎实体库）
 add_library(game_npc STATIC
         Game/Entities/NPC/DeadBody.cpp
         Game/Entities/NPC/DeadBody.hpp
 )
-target_link_libraries(game_npc PUBLIC engine_entities)
+target_link_libraries(game_npc PUBLIC engine_core)
 
 
 # 3. 游戏脚本加载
 add_library(game_script STATIC
-        Game/Script/Native/LoadMusic.cpp
-        Game/Script/Native/LoadMusic.hpp
+        Game/Script/Native/Audio/AudioLoader.cpp
+        Game/Script/Native/Audio/AudioLoader.hpp
+        Game/Script/Native/Audio/SFX.cpp
+        Game/Script/Native/Audio/Music.cpp
 )
-target_link_libraries(game_script PUBLIC engine_audio)
+target_link_libraries(game_script PUBLIC engine_core)
 
 # 3. 配置库（仅头文件，无需链接）
-add_library(game_config INTERFACE)
+add_library(game_config INTERFACE
+        Game/Config/Audios/Music.hpp
+        Game/Config/Audios/SFX.hpp
+        Game/Config/Entities/NPC.hpp
+        Game/Config/Entities/Player.hpp
+        Game/Config/Utilities/Transer.hpp
+)
 
 # 4. 主游戏库（聚合游戏组件）
 add_library(game_core INTERFACE)

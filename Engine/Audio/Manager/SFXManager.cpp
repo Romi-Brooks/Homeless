@@ -22,7 +22,7 @@ namespace engine::audio::manager {
 		return manager;
 	}
 
-	bool SFXManager::LoadSFXFiles(const std::string& id, const std::string& filePath) {
+	auto SFXManager::LoadSFXFiles(const std::string& id, const std::string& filePath)-> bool {
 		// 检查是否已加载
 		if (soundBuffers_.contains(id)) {
 			LOG_WARNING(log::LogChannel::ENGINE_AUDIO_SFX, "SFX with id " + id + ", is already loaded");
@@ -64,16 +64,16 @@ namespace engine::audio::manager {
 		return true;
 	}
 
-	sf::SoundBuffer* SFXManager::GetSFXBuffer(const std::string& id) {
+	auto SFXManager::GetSFXBuffer(const std::string& id) -> sf::SoundBuffer* {
 		const auto it = soundBuffers_.find(id);
 		return (it != soundBuffers_.end()) ? it->second.get() : nullptr;
 	}
 
-	bool SFXManager::HasSFX(const std::string& id) const  {
+	auto SFXManager::HasSFX(const std::string& id) const -> bool {
 		return soundBuffers_.contains(id);
 	}
 
-	bool SFXManager::UnloadSFX(const std::string& id) {
+	auto SFXManager::UnloadSFX(const std::string& id) -> bool {
 		const auto it = soundBuffers_.find(id);
 		if (it != soundBuffers_.end()) {
 			soundBuffers_.erase(it);
@@ -84,12 +84,12 @@ namespace engine::audio::manager {
 		return false;
 	}
 
-	void SFXManager::UnloadAll() {
+	auto SFXManager::UnloadAll() -> void {
 		soundBuffers_.clear();
 		LOG_INFO(log::LogChannel::ENGINE_AUDIO_SFX, "All SFX resources unloaded");
 	}
 
-	size_t SFXManager::GetLoadedCount() const {
+	auto SFXManager::GetLoadedCount() const -> size_t {
 		return soundBuffers_.size();
 	}
 } // namespace engine::audio

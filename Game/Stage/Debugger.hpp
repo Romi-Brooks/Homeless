@@ -13,16 +13,170 @@
 #include <imgui.h>
 #include <imgui-SFML.h>
 
-#include "../../Engine/Windows/Manager/ScreenManager.hpp"
-#include "../../Engine/Windows/Screen.hpp"
-#include "Audio/Manager/VolumeManager.hpp"
-#include "Audio/Plug/MusicFade.hpp"
+#include <Windows/Manager/ScreenManager.hpp>
+#include <Windows/RenderWindow.hpp>
+#include <Windows/Screen.hpp>
 
-using DebuggerWindowsManager = engine::window::manager::ScreenManager;
+#include <Audio/Manager/VolumeManager.hpp>
+#include <Audio/Plug/MusicFade.hpp>
+#include <Audio/Music.hpp>
+#include <Audio/SFX.hpp>
 
 class Debugger : public engine::window::screen::Screen {
 	private:
-		static auto CreateImGuiInterface(sf::RenderWindow& window) -> void {
+		// 音频资源映射：显示名 + 实际播放的资源名
+		struct AudioResource {
+			std::string display_name;  // 界面上显示的名称
+			std::string resource_name; // 传给引擎的资源名
+		};
+
+		// 背景音乐列表（可按需扩展）
+		const std::vector<AudioResource> background_musics = {
+			{"Background 1", "native_background_1"},
+			{"Background 2", "native_background_2"},
+			{"Background 3", "lua_background_1"},
+			{"Background 4", "lua_background_2"}
+		};
+
+		// SFX音效列表（可选，也可保留独立按钮）
+		const std::vector<AudioResource> sfx_sounds = {
+			{"Kick", "native_kick"},
+			{"Snare", "native_snare"},
+			{"Bird Call", "lua_niaojiao"}
+		};
+
+		void DrawAudioCombo() const {
+			ImGui::Begin("Audio Player", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+
+			{
+				// 背景音乐下拉选单
+				static int selected_bg_index = 0; // 保存选中的索引
+				ImGui::SeparatorText("Background Music");
+				// 构建下拉框的显示名数组
+				const char* current_bg = background_musics[selected_bg_index].display_name.c_str();
+				if (ImGui::BeginCombo("Select Music", current_bg)) {
+					for (int i = 0; i < background_musics.size(); i++) {
+						const bool is_selected = (selected_bg_index == i);
+						if (ImGui::Selectable(background_musics[i].display_name.c_str(), is_selected)) {
+							selected_bg_index = i; // 更新选中索引
+						}
+						if (is_selected) {
+							ImGui::SetItemDefaultFocus(); // 选中项自动聚焦
+						}
+					}
+					ImGui::EndCombo();
+				}
+
+				// 播放选中的背景音乐
+				ImGui::SameLine();
+				if (ImGui::Button("Play Selected Music")) {
+					const auto& [display_name, resource_name] = background_musics[selected_bg_index];
+					engine::audio::Music::GetInstance().Play(resource_name);
+				}
+			}
+
+
+			{
+				// SFX下拉选单
+				ImGui::SeparatorText("SFX Sounds");
+				static int selected_sfx_index = 0;
+				const char* current_sfx = sfx_sounds[selected_sfx_index].display_name.c_str();
+				if (ImGui::BeginCombo("Select SFX", current_sfx)) {
+					for (int i = 0; i < sfx_sounds.size(); i++) {
+						const bool is_selected = (selected_sfx_index == i);
+						if (ImGui::Selectable(sfx_sounds[i].display_name.c_str(), is_selected)) {
+							selected_sfx_index = i; // 更新选中索引
+						}
+						if (is_selected) {
+							ImGui::SetItemDefaultFocus(); // 选中项自动聚焦
+						}
+					}
+					ImGui::EndCombo();
+				}
+				// 播放选中的SFX
+				ImGui::SameLine();
+				if (ImGui::Button("Play Selected SFX")) {
+					const auto& [display_name, resource_name] = sfx_sounds[selected_sfx_index];
+					engine::audio::SFX::GetInstance().Play(resource_name);
+				}
+			}
+
+			{
+		        ImGui::SeparatorText("Background Music (Fade Switch)");
+		        // 保存源音乐和目标音乐的选中状态
+		        static int selected_from_bg_index = 0; // 切换的源音乐索引
+		        static int selected_to_bg_index = 1;   // 切换的目标音乐索引（默认选第二首）
+
+		        // 1. 源音乐下拉框
+		        const char* current_from_bg = background_musics[selected_from_bg_index].display_name.c_str();
+		        ImGui::Text("From:");
+		        ImGui::SameLine();
+		        if (ImGui::BeginCombo("##from_music", current_from_bg, ImGuiComboFlags_NoArrowButton)) {
+		            for (int i = 0; i < background_musics.size(); i++) {
+		                const bool is_selected = (selected_from_bg_index == i);
+		                if (ImGui::Selectable(background_musics[i].display_name.c_str(), is_selected)) {
+		                    selected_from_bg_index = i;
+		                }
+		                if (is_selected) {
+		                    ImGui::SetItemDefaultFocus();
+		                }
+		            }
+		            ImGui::EndCombo();
+		        }
+
+		        // 2. 目标音乐下拉框
+		        const char* current_to_bg = background_musics[selected_to_bg_index].display_name.c_str();
+		        ImGui::SameLine();
+		        ImGui::Text("To:");
+		        ImGui::SameLine();
+		        if (ImGui::BeginCombo("##to_music", current_to_bg, ImGuiComboFlags_NoArrowButton)) {
+		            for (int i = 0; i < background_musics.size(); i++) {
+		                const bool is_selected = (selected_to_bg_index == i);
+		                if (ImGui::Selectable(background_musics[i].display_name.c_str(), is_selected)) {
+		                    selected_to_bg_index = i;
+		                }
+		                if (is_selected) {
+		                    ImGui::SetItemDefaultFocus();
+		                }
+		            }
+		            ImGui::EndCombo();
+		        }
+
+		        // 3. 切换按钮 + 同名校验
+		        ImGui::SameLine();
+		        bool is_same_music = (selected_from_bg_index == selected_to_bg_index);
+		        if (is_same_music) {
+		            // 选中同一首音乐时，按钮置灰并显示警告
+		            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
+		            ImGui::Button("Switch Background");
+		            ImGui::PopStyleColor();
+		            // 红色警告文本
+		            ImGui::SameLine();
+		            ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Same music selected!");
+		        } else {
+		            // 正常状态：点击按钮调用切换接口
+		            if (ImGui::Button("Switch Background")) {
+		                const auto& [from_display, from_resource] = background_musics[selected_from_bg_index];
+		                const auto& [to_display, to_resource] = background_musics[selected_to_bg_index];
+		                engine::audio::plug::MusicFade::GetInstance().Switch(from_resource, to_resource);
+		            }
+		        }
+		    }
+
+			ImGui::End();
+		}
+
+		auto DrawFPSSelector() const -> void {
+			if (ImGui::Button("Set FPS To 120")) {
+				engine::window::RenderWindow::GetInstance().SetFPS(120);
+			}
+
+			if (ImGui::Button("Set FPS To 60")) {
+				engine::window::RenderWindow::GetInstance().SetFPS(60);
+			}
+		}
+
+		auto CreateImGuiInterface(sf::RenderWindow& window) const -> void {
 			ImGui::Begin("Homeless ImGui Debugger");
 
 			ImGui::Text("Build Debugger with SFML3 and Imgui 1.92.2");
@@ -42,30 +196,16 @@ class Debugger : public engine::window::screen::Screen {
 				engine::window::manager::ScreenManager::GetInstance().PushScreen("Debugger");
 			}
 
-			if (ImGui::Button("Play Kick")) {
-				engine::audio::SFX::GetInstance().Play("Kick");
-			}
+			DrawAudioCombo();
 
-			if (ImGui::Button("Play Snare")) {
-				engine::audio::SFX::GetInstance().Play("Snare");
-			}
-
-			if (ImGui::Button("Play Background")) {
-				engine::audio::Music::GetInstance().Play("bg1");
-			}
-
-			if (ImGui::Button("Switch Background")) {
-				engine::audio::plug::MusicFade::GetInstance().Switch("bg1", "bg2");
-			}
+			DrawFPSSelector();
 
 			float currentVol = engine::audio::manager::VolumeManager::GetMusicVolume();
 			if (ImGui::SliderFloat("Music Volume", &currentVol, 0.0f, 100.0f, "%.1f%%")	) {
 				engine::audio::manager::VolumeManager::SetMusicVolume(currentVol);
 			}
 
-			if (ImGui::Button("Load Player")) {
-				// Generate::GeneratePlayer(this->player_, "Romi", *this->window_);
-			}
+
 
 			if (ImGui::Button("Clear NPC&Player")) {
 				// this->ClearNPC();

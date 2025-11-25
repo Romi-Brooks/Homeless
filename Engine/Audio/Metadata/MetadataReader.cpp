@@ -18,6 +18,8 @@
 #include <taglib/attachedpictureframe.h>
 #include <taglib/infotag.h>  // For WAV RIFF INFO tag
 
+#include <utf8.h>
+
 #include "../../FileSystem/Encoder/Encoder.hpp"
 #include "../../Log/LogSystem.hpp"
 

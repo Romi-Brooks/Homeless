@@ -20,8 +20,6 @@
 // Third party Library
 #include <SFML/Audio/SoundBuffer.hpp>
 
-
-
 namespace engine::audio::manager {
 	class SFXManager {
 		private:
@@ -38,22 +36,22 @@ namespace engine::audio::manager {
 			static SFXManager& GetManager();
 
 		    // 加载SFX文件
-		    bool LoadSFXFiles(const std::string& id, const std::string& filePath);
+		    auto LoadSFXFiles(const std::string& id, const std::string& filePath) -> bool;
 
 		    // 获取SFX缓冲区
-		    sf::SoundBuffer* GetSFXBuffer(const std::string& id);
+		    auto GetSFXBuffer(const std::string& id) -> sf::SoundBuffer*;
 
 		    // 检查SFX是否已加载
-		    bool HasSFX(const std::string& id) const;
+		    auto HasSFX(const std::string& id) const -> bool;
 
 		    // 卸载特定SFX
-		    bool UnloadSFX(const std::string& id);
+		    auto UnloadSFX(const std::string& id) -> bool;
 
 		    // 卸载所有SFX
-		    void UnloadAll();
+		    auto UnloadAll() -> void;
 
 		    // 获取已加载SFX数量
-		    size_t GetLoadedCount() const;
+		    auto GetLoadedCount() const -> size_t;
 		};
 }
 
