@@ -20,8 +20,6 @@
 // Self Dependencies
 #include "../../Config/Movement/MoveEvent.hpp"
 
-using engine::config::movements::Movement;
-
 namespace engine::entity {
 	class Entity {
 		protected:
@@ -76,7 +74,7 @@ namespace engine::entity {
 				return true;
 			}
 
-			virtual auto Move(const Movement Signal) const -> void {
+			virtual auto Move(const config::movements::Movement Signal) const -> void {
 					// should give to subclass
 			}
 

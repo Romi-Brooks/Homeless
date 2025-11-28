@@ -39,7 +39,22 @@ class HUD : public engine::window::screen::Screen {
 		}
 
 		bool HandleEvent(const sf::Event& event) override {
-
+			// 鼠标移动事件：只在鼠标悬停在菜单项上时处理，但不消费（允许下层屏幕也响应移动）
+			if (const auto* mouseMoved = event.getIf<sf::Event::MouseMoved>()) {
+				const sf::Vector2f mousePos(
+					static_cast<float>(mouseMoved->position.x),
+					static_cast<float>(mouseMoved->position.y)
+				);
+				for (size_t i = 0; i < menuItems.size(); ++i) {
+					if (menuItems[i].getGlobalBounds().contains(mousePos)) {
+						selectedItem = i;
+						break;
+					}
+				}
+				return false; // 不消费移动事件，下层可响应
+			}
+			// 其他事件（如键盘）按需处理
+			return false;
 		}
 
 		void Update(float deltaTime) override {

@@ -7,6 +7,7 @@
   Copyright (c) 2025 Romi Brooks, All rights reserved.
 **/
 
+// Standard Library
 #include <string>
 #include <iostream>
 #include <mutex>
@@ -14,11 +15,12 @@
 #include <sstream>
 #include <iomanip>
 
+// Self Dependencies
 #include "LogSystem.hpp"
 
-using Log = engine::log::Log;
-using LogLevel = engine::log::LogLevel;
-using LogChannel = engine::log::LogChannel;
+using engine::log::Log;
+using engine::log::LogLevel;
+using engine::log::LogChannel;
 
 // Forward Function
 std::string GetLogLevel(const LogLevel& logLevel) {

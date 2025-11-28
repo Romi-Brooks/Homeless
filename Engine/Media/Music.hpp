@@ -26,10 +26,14 @@ namespace engine::audio {
 			// Music instances mapped by ID
 			std::unordered_map<std::string, std::unique_ptr<sf::Music>> musics_ {};
 
+			std::string current_playing_id_;
+
+			std::mutex mutex_;
+			mutable std::mutex current_playing_mutex_;
+
 			// Global volume for all sounds
 			static float music_volume_;
 
-			// Private constructor for singleton
 			Music() = default;
 
 		public:
@@ -37,7 +41,6 @@ namespace engine::audio {
 			Music(const Music&) = delete;
 			Music& operator=(const Music&) = delete;
 
-			// Get singleton instance
 			static Music& GetInstance();
 
 			// Load a music file
@@ -45,20 +48,28 @@ namespace engine::audio {
 
 			auto Play(const std::string& id) -> void;
 
+			// if, We play a sound effect with special volume
+			auto Play(const std::string& id, float volume) -> void;
+
 			auto Stop(const std::string& id) -> void;
 
 			// Set volume for a specific sound effect
 			auto SetVolume(const std::string& id, float volume) -> void;
 
-			// Instead, We play a sound effect with special volume
-			auto Play(const std::string& id, float volume) -> void;
-
 			// Volume Manager use this interface to set the playing time volume
 			auto SetMusicVolume(float volume) const -> void;
 
+			auto SetNowPlaying(const std::string& id) -> void;
+
 			auto GetMusicVolume() const -> float;
 
+			auto GetNowPlaying() const -> std::string;
+
 			auto IsLoaded(const std::string& id) const -> bool;
+
+			auto IsNowPlaying(const std::string& id) const -> bool;
+
+			auto ClearNowPlaying() -> void;
 	};
 }
 

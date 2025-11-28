@@ -1,15 +1,16 @@
+// Standard Library
 #include <algorithm>
 #include <iostream>
+
+// Third party Library
 #include <utf8.h>
 
+// Self Dependencies
 #include "Packager.hpp"
 
 namespace engine::tools::package {
-	// Config 结构体构造函数实现
-	Packager::Config::Config() : compress(false), verbose(false),
-	                           preserveStructure(true), overwrite(true) {}
+	Packager::Config::Config() : compress(false), preserveStructure(true), overwrite(true) {}
 
-	// 私有辅助方法实现
 	std::string Packager::NormalizePath(const std::string& path) {
 	    try {
 	        std::string result = path;
@@ -48,11 +49,7 @@ namespace engine::tools::package {
 	    try {
 	        return path.string();
 	    } catch (const std::exception& e) {
-	        // 使用默认配置检查verbose，因为这里没有config参数
-	        static Config defaultConfig;
-	        if (defaultConfig.verbose) {
-	            std::cout << "警告: 路径转换错误: " << e.what() << std::endl;
-	        }
+	    	std::cout << "Warning: Path conversion error: " << e.what() << std::endl;
 	        return "unknown_path";
 	    }
 	}
@@ -61,24 +58,17 @@ namespace engine::tools::package {
 	    try {
 	        return fs::relative(path).string();
 	    } catch (const std::exception& e) {
-	        static Config defaultConfig;
-	        if (defaultConfig.verbose) {
-	            std::cout << "警告: 无法获取相对路径: " << e.what() << std::endl;
-	        }
+	    	std::cout << "Warning: Unable to obtain relative path: " << e.what() << std::endl;
 	        return path.filename().string();
 	    }
 	}
 
-	bool Packager::CollectFiles(const std::vector<std::string>& resourcePaths,
-	                           std::vector<fs::path>& allFiles,
-	                           const Config& config) {
+	bool Packager::CollectFiles(const std::vector<std::string>& resourcePaths, std::vector<fs::path>& allFiles, const Config& config) {
 	    for (const auto& path_str : resourcePaths) {
 	        try {
 	            fs::path path(path_str);
 	            if (!fs::exists(path)) {
-	                if (config.verbose) {
-	                    std::cout << "警告: 路径不存在: " << path_str << std::endl;
-	                }
+	            	std::cout << "Warning: Path does not exist: " << path_str << std::endl;
 	                continue;
 	            }
 
@@ -92,9 +82,7 @@ namespace engine::tools::package {
 	                allFiles.push_back(path);
 	            }
 	        } catch (const std::exception& e) {
-	            if (config.verbose) {
-	                std::cout << "警告: 处理路径时出错 " << path_str << ": " << e.what() << std::endl;
-	            }
+	            std::cout << "Warning: Error occurred while processing the path " << path_str << ": " << e.what() << std::endl;
 	        }
 	    }
 	    return !allFiles.empty();
@@ -103,34 +91,28 @@ namespace engine::tools::package {
 	std::string Packager::GenerateInternalFilename(const fs::path& filePath, const Config& config) {
 	    try {
 	        if (config.preserveStructure) {
-	            std::string relative_path = SafeRelativePath(filePath);
+				const std::string relative_path = SafeRelativePath(filePath);
 	            return ToUTF8(NormalizePath(relative_path));
 	        } else {
-	            std::string filename = ToUTF8(SafePathToString(filePath.filename()));
+				const std::string filename = ToUTF8(SafePathToString(filePath.filename()));
 	            int counter = 1;
 	            std::string final_name = filename;
 
 	            while (file_index_.contains(final_name)) {
 	                std::string stem = ToUTF8(SafePathToString(filePath.stem()));
-	                std::string extension = ToUTF8(SafePathToString(filePath.extension()));
+					const std::string extension = ToUTF8(SafePathToString(filePath.extension()));
 	                final_name = stem + "_" + std::to_string(counter) += extension;
 	                counter++;
 	            }
 	            return final_name;
 	        }
 	    } catch (const std::exception& e) {
-	        if (config.verbose) {
-	            std::cout << "错误: 生成内部文件名失败: " << e.what() << std::endl;
-	        }
+	    	std::cout << "Error: Failed to generate internal filename: " << e.what() << std::endl;
 	        return "unknown_file_" + std::to_string(file_index_.size());
 	    }
 	}
 
-	// 公共方法实现
-	Packager::Result Packager::Pack(const std::vector<std::string>& resourcePaths,
-	                               const std::string& outputFile,
-	                               const Config& config) {
-
+	Packager::Result Packager::Pack(const std::vector<std::string>& resourcePaths, const std::string& outputFile, const Config& config) {
 	    file_table_.clear();
 	    file_index_.clear();
 
@@ -142,9 +124,7 @@ namespace engine::tools::package {
 	            fs::remove(outputFile);
 	        }
 	    } catch (const std::exception& e) {
-	        if (config.verbose) {
-	            std::cout << "错误: 无法删除已存在文件: " << e.what() << std::endl;
-	        }
+	    	std::cout << "Error: Unable to delete existing file: " << e.what() << std::endl;
 	        return Result::ERROR_WRITE_FAILED;
 	    }
 
@@ -163,7 +143,7 @@ namespace engine::tools::package {
 	    output.write(reinterpret_cast<const char*>(&VERSION), sizeof(VERSION));
 
 	    // 预留文件表位置 - 先写入文件数量为0，稍后更新
-	    uint64_t file_table_offset = static_cast<uint64_t>(output.tellp());
+	    uint64_t file_table_offset = output.tellp();
 	    uint32_t file_count = 0;
 	    output.write(reinterpret_cast<const char*>(&file_count), sizeof(file_count));
 
@@ -176,17 +156,13 @@ namespace engine::tools::package {
 	        try {
 	            input.open(filePath, std::ios::binary);
 	        } catch (const std::exception& e) {
-	            if (config.verbose) {
-	                std::cout << "警告: 无法打开文件: " << SafePathToString(filePath)
-	                          << " - " << e.what() << std::endl;
-	            }
+	        	std::cout << "Warning: Unable to open file: " << SafePathToString(filePath)
+	        			  << " - " << e.what() << std::endl;
 	            continue;
 	        }
 
 	        if (!input.is_open()) {
-	            if (config.verbose) {
-	                std::cout << "警告: 无法打开文件: " << SafePathToString(filePath) << std::endl;
-	            }
+	        	std::cout << "Warning: Unable to open file: " << SafePathToString(filePath) << std::endl;
 	            continue;
 	        }
 
@@ -196,9 +172,7 @@ namespace engine::tools::package {
 	        input.seekg(0, std::ios::beg);
 
 	        if (file_size == 0) {
-	            if (config.verbose) {
-	                std::cout << "警告: 跳过空文件: " << SafePathToString(filePath) << std::endl;
-	            }
+	        	std::cout << "Warning: Skipping empty files: " << SafePathToString(filePath) << std::endl;
 	            input.close();
 	            continue;
 	        }
@@ -212,9 +186,7 @@ namespace engine::tools::package {
 	            entry.offset = current_offset;
 	            entry.size = file_size;
 	        } catch (const std::exception& e) {
-	            if (config.verbose) {
-	                std::cout << "错误: 创建文件条目失败: " << e.what() << std::endl;
-	            }
+	        	std::cout << "Error: Failed to create file entry: " << e.what() << std::endl;
 	            input.close();
 	            continue;
 	        }
@@ -224,9 +196,7 @@ namespace engine::tools::package {
 	        input.read(buffer.data(), static_cast<long long>(file_size));
 
 	        if (!input) {
-	            if (config.verbose) {
-	                std::cout << "警告: 读取文件失败: " << SafePathToString(filePath) << std::endl;
-	            }
+	        	std::cout << "Warning: Failed to read file: " << SafePathToString(filePath) << std::endl;
 	            input.close();
 	            continue;
 	        }
@@ -241,9 +211,7 @@ namespace engine::tools::package {
 	        entries.push_back(entry);
 	        file_count++;
 
-	        if (config.verbose) {
-	            std::cout << "打包: " << entry.filename << " (" << file_size << " 字节)" << std::endl;
-	        }
+	    	std::cout << "Packing: " << entry.filename << " (" << file_size << " bytes)" << std::endl;
 	    }
 
 	    if (file_count == 0) {
@@ -251,13 +219,13 @@ namespace engine::tools::package {
 	        try {
 	            fs::remove(outputFile);
 	        } catch (...) {
-	            // 忽略删除错误
+
 	        }
 	        return Result::ERROR_EMPTY_PACKAGE;
 	    }
 
 	    // 记录文件表开始位置
-	    uint64_t table_start = static_cast<uint64_t>(output.tellp());
+	    uint64_t table_start = output.tellp();
 
 	    // 更新文件计数
 	    output.seekp(static_cast<std::streampos>(static_cast<long long>(file_table_offset)));
@@ -289,46 +257,42 @@ namespace engine::tools::package {
 	        file_index_[entry.filename] = file_table_.size() - 1;
 	    }
 
-	    // 写入文件表偏移量 - 这是关键修复：写入table_start而不是file_table_offset
+	    // 写入文件表偏移量
 	    uint64_t table_end = static_cast<uint64_t>(output.tellp());
 	    output.write(reinterpret_cast<const char*>(&table_start), sizeof(table_start));
 
 	    output.close();
 
 	    // 验证包文件
-	    if (config.verbose) {
-	        std::cout << "打包完成，开始验证..." << std::endl;
-	        std::ifstream verify(outputFile, std::ios::binary);
-	        if (verify.is_open()) {
-	            char magic[4];
-	            verify.read(magic, 4);
-	            std::string magic_str(magic, 4);
-	            std::cout << "验证魔数: " << magic_str << " " << (magic_str == "HPKG" ? "✓" : "✗") << std::endl;
+		std::cout << "Packing complete, commencing verification..." << std::endl;
+		std::ifstream verify(outputFile, std::ios::binary);
+		if (verify.is_open()) {
+			char magic[4];
+			verify.read(magic, 4);
+			std::string magic_str(magic, 4);
+			std::cout << "Verification magic number: " << magic_str << " " << (magic_str == "HPKG" ? "T" : "F") << std::endl;
 
-	            uint16_t version;
-	            verify.read(reinterpret_cast<char*>(&version), sizeof(version));
-	            std::cout << "验证版本: " << version << " " << (version == 1 ? "✓" : "✗") << std::endl;
+			uint16_t version;
+			verify.read(reinterpret_cast<char*>(&version), sizeof(version));
+			std::cout << "Verification version: " << version << " " << (version == 1 ? "T" : "F") << std::endl;
 
-	            uint32_t file_count_verify;
-	            verify.read(reinterpret_cast<char*>(&file_count_verify), sizeof(file_count_verify));
-	            std::cout << "验证文件数量: " << file_count_verify << " " << (file_count_verify == file_count ? "✓" : "✗") << std::endl;
+			uint32_t file_count_verify;
+			verify.read(reinterpret_cast<char*>(&file_count_verify), sizeof(file_count_verify));
+			std::cout << "Number of documents to be verified: " << file_count_verify << " " << (file_count_verify == file_count ? "T" : "F") << std::endl;
 
-	            // 读取文件表偏移量
-	            verify.seekg(-static_cast<std::streamoff>(sizeof(uint64_t)), std::ios::end);
-	            uint64_t table_offset_verify;
-	            verify.read(reinterpret_cast<char*>(&table_offset_verify), sizeof(table_offset_verify));
-	            std::cout << "验证文件表偏移量: " << table_offset_verify << " "
-	                      << (table_offset_verify == table_start ? "✓" : "✗") << std::endl;
+			// 读取文件表偏移量
+			verify.seekg(-static_cast<std::streamoff>(sizeof(uint64_t)), std::ios::end);
+			uint64_t table_offset_verify;
+			verify.read(reinterpret_cast<char*>(&table_offset_verify), sizeof(table_offset_verify));
+			std::cout << "Verification file table offset: " << table_offset_verify << " "
+					  << (table_offset_verify == table_start ? "T" : "F") << std::endl;
 
-	            verify.close();
-	        }
+			verify.close();
 	    }
 
-	    if (config.verbose) {
-	        std::cout << "打包完成: " << outputFile << std::endl;
-	        std::cout << "包含 " << file_count << " 个文件" << std::endl;
-	        std::cout << "包大小: " << table_end + sizeof(uint64_t) << " 字节" << std::endl;
-	    }
+		std::cout << "Packing completed: " << outputFile << std::endl;
+		std::cout << "Includes "<< file_count << " files" << std::endl;
+		std::cout << "Package size: " << table_end + sizeof(uint64_t) << " bytes" << std::endl;
 
 	    return Result::SUCCESS;
 	}
@@ -342,10 +306,10 @@ namespace engine::tools::package {
 	}
 
 	void Packager::PrintPackageInfo() const {
-	    std::cout << "包中包含 " << file_table_.size() << " 个文件:" << std::endl;
+	    std::cout << "The package contains " << file_table_.size() << " files:" << std::endl;
 	    for (const auto& entry : file_table_) {
 	        std::cout << "  " << entry.filename << " [" << entry.type << "] - "
-	                  << entry.size << " 字节" << std::endl;
+	                  << entry.size << " bytes" << std::endl;
 	    }
 	}
 }

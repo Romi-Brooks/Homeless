@@ -8,7 +8,7 @@
 **/
 
 #include "../../../Config/Audios/Music.hpp"
-#include <Audio/Music.hpp>
+#include <Media/Music.hpp>
 
 auto LoadMusic() -> void {
 	engine::audio::Music::GetInstance().Load("native_background_1", hl_music::native_background_1);

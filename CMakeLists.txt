@@ -138,24 +138,26 @@ add_library(engine_entities STATIC
 )
 # Dependency: None
 
-# 3. 音频库
-add_library(engine_audio STATIC
-        Engine/Audio/Metadata/MetadataReader.cpp
-        Engine/Audio/Metadata/MetadataReader.hpp
-        Engine/Audio/Manager/SFXManager.cpp
-        Engine/Audio/Manager/SFXManager.hpp
-        Engine/Audio/Manager/VolumeManager.cpp
-        Engine/Audio/Manager/VolumeManager.hpp
-        Engine/Audio/Plug/MusicFade.cpp
-        Engine/Audio/Plug/MusicFade.hpp
-        Engine/Audio/Music.cpp
-        Engine/Audio/Music.hpp
-        Engine/Audio/SFX.cpp
-        Engine/Audio/SFX.hpp
+# 3. 多媒体库
+add_library(engine_media STATIC
+        Engine/Media/Metadata/MetadataReader.cpp
+        Engine/Media/Metadata/MetadataReader.hpp
+        Engine/Media/Manager/SFXManager.cpp
+        Engine/Media/Manager/SFXManager.hpp
+        Engine/Media/Manager/VolumeManager.cpp
+        Engine/Media/Manager/VolumeManager.hpp
+        Engine/Media/Plug/MusicFade.cpp
+        Engine/Media/Plug/MusicFade.hpp
+        Engine/Media/Music.cpp
+        Engine/Media/Music.hpp
+        Engine/Media/SFX.cpp
+        Engine/Media/SFX.hpp
+        Engine/Media/Video.cpp
+        Engine/Media/Video.hpp
 )
-target_include_directories(engine_audio PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Engine)
+target_include_directories(engine_media PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Engine)
 # Dependency: sfml + log
-target_link_libraries(engine_audio PUBLIC sfml_all engine_log)
+target_link_libraries(engine_media PUBLIC sfml_all engine_log)
 
 # 4. 实用工具库
 add_library(engine_utilities STATIC
@@ -243,7 +245,7 @@ target_link_libraries(engine_config PUBLIC engine_entities)
 add_library(engine_core INTERFACE)
 target_link_libraries(engine_core INTERFACE
         engine_entities
-        engine_audio
+        engine_media
         engine_utilities
         engine_tools
         engine_filesystem

@@ -10,10 +10,14 @@
 // Standard Library
 #include <ranges>
 
+// Third party Library
+#include <SFML/Audio/SoundBuffer.hpp>
+
 // Self Dependencies
 #include "SFX.hpp"
 #include "Manager/SFXManager.hpp"
 #include "../Log/LogSystem.hpp"
+
 
 namespace engine::audio {
 

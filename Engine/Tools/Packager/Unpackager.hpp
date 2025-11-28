@@ -1,6 +1,7 @@
 #ifndef UNPACKAGER_HPP
 #define UNPACKAGER_HPP
 
+// Standard Library
 #include <string>
 #include <vector>
 #include <fstream>
@@ -37,7 +38,7 @@ namespace engine::tools::unpackage {
 		        [[nodiscard]] std::string ToString() const;
 		    };
 
-		    // 操作结果枚举
+		    // 操作结果
 		    enum class Result {
 		        SUCCESS,
 		        ERROR_OPEN_FILE,
@@ -76,17 +77,16 @@ namespace engine::tools::unpackage {
 		    void PrintPackageInfo() const;
 
 		private:
-		    // 私有成员变量
 		    std::vector<FileEntry> file_table_;
 		    std::unordered_map<std::string, size_t> file_index_;
 		    std::string package_path_;
 		    std::ifstream package_stream_;
 
-		    // 包文件的魔数和版本号（编译期常量）
+		    // 魔数和版本号（
 		    static constexpr char MAGIC[4] = {'H', 'P', 'K', 'G'};
 		    static constexpr uint16_t VERSION = 1;
 
-		    // 私有工具函数
+		    // 工具函数
 		    bool CreateDirectory(const std::filesystem::path& dir_path);
 		    std::string SafePathToString(const std::filesystem::path& path);
 		    uint64_t GetFileSize(const std::string& filename);

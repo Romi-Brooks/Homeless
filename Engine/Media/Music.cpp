@@ -9,6 +9,9 @@
 
 // Self Dependencies
 #include "Music.hpp"
+
+#include <ranges>
+
 #include "../Log/LogSystem.hpp"
 
 namespace engine::audio {
@@ -22,7 +25,7 @@ namespace engine::audio {
 		// 0. 检查是否已加载
 		if (musics_.contains(id)) {
 			LOG_WARNING(log::LogChannel::ENGINE_AUDIO_MUSIC, "Music with id '" + id + "' is already loaded");
-			return true; // 已加载视为成功
+			return true; // 已加载成功
 		}
 
 		// 1. 从文件加载
@@ -41,12 +44,19 @@ namespace engine::audio {
 	}
 
 	auto Music::Play(const std::string& id) -> void {
+		std::lock_guard<std::mutex> lock(mutex_);
 		const auto it = musics_.find(id);
 		if (it != musics_.end() && it->second) {
-			// we use Volume Manager class to make sure that audio plays well
+			// 设置音量并播放
 			it->second->setVolume(music_volume_);
-
 			it->second->play();
+
+			// 更新当前播放状态
+			{
+				std::lock_guard<std::mutex> current_lock(current_playing_mutex_);
+				current_playing_id_ = id;
+			}
+
 			LOG_INFO(log::LogChannel::ENGINE_AUDIO_MUSIC, "Playing: " + id);
 		} else {
 			LOG_WARNING(log::LogChannel::ENGINE_AUDIO_MUSIC, "Music not found or not loaded: " + id);
@@ -54,14 +64,25 @@ namespace engine::audio {
 	}
 
 	auto Music::Stop(const std::string& id) -> void {
+		std::lock_guard<std::mutex> lock(mutex_);
 		const auto it = musics_.find(id);
 		if (it != musics_.end() && it->second) {
 			it->second->stop();
-			LOG_INFO(log::LogChannel::ENGINE_AUDIO_MUSIC, "Stoping: " + id);
+
+			// 如果停止的是当前播放的歌曲，清除状态
+			{
+				std::lock_guard<std::mutex> current_lock(current_playing_mutex_);
+				if (current_playing_id_ == id) {
+					current_playing_id_.clear();
+				}
+			}
+
+			LOG_INFO(log::LogChannel::ENGINE_AUDIO_MUSIC, "Stopping: " + id);
 		}
 	}
 
 	auto Music::SetVolume(const std::string& id, const float volume) -> void {
+		std::lock_guard<std::mutex> lock(mutex_);
 		const auto it = musics_.find(id);
 		if (it != musics_.end() && it->second) {
 			it->second->setVolume(volume);
@@ -69,11 +90,18 @@ namespace engine::audio {
 	}
 
 	auto Music::Play(const std::string& id, const float volume) -> void {
+		std::lock_guard<std::mutex> lock(mutex_);
 		const auto it = musics_.find(id);
 		if (it != musics_.end() && it->second) {
-			// use epically volume parameter
 			it->second->setVolume(volume);
 			it->second->play();
+
+			// 更新当前播放状态
+			{
+				std::lock_guard<std::mutex> current_lock(current_playing_mutex_);
+				current_playing_id_ = id;
+			}
+
 			LOG_INFO(log::LogChannel::ENGINE_AUDIO_MUSIC, "Playing: " + id + ", with volume: " + std::to_string(volume));
 		} else {
 			LOG_WARNING(log::LogChannel::ENGINE_AUDIO_MUSIC, "Music not found or not loaded: " + id);
@@ -82,8 +110,8 @@ namespace engine::audio {
 
 	auto Music::SetMusicVolume(const float volume) const -> void {
 		music_volume_ = volume;
-		for (const auto& it : musics_) {
-			it.second->setVolume(music_volume_);
+		for (const auto& val : musics_ | std::views::values) {
+			val->setVolume(music_volume_);
 		}
 	}
 
@@ -92,11 +120,27 @@ namespace engine::audio {
 	}
 
 	auto Music::IsLoaded(const std::string& id) const -> bool {
-		if (!musics_.find(id)->second) {
-			return false;
-		}
-		return true;
+		const auto it = musics_.find(id);
+		return it != musics_.end() && it->second != nullptr;
 	}
 
+	auto Music::GetNowPlaying() const -> std::string {
+		std::lock_guard<std::mutex> lock(current_playing_mutex_);
+		return current_playing_id_;
+	}
 
+	auto Music::SetNowPlaying(const std::string& id) -> void {
+		std::lock_guard<std::mutex> lock(current_playing_mutex_);
+		current_playing_id_ = id;
+	}
+
+	auto Music::ClearNowPlaying() -> void {
+		std::lock_guard<std::mutex> lock(current_playing_mutex_);
+		current_playing_id_.clear();
+	}
+
+	auto Music::IsNowPlaying(const std::string& id) const -> bool {
+		std::lock_guard<std::mutex> lock(current_playing_mutex_);
+		return current_playing_id_ == id;
+	}
 }

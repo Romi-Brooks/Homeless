@@ -11,9 +11,9 @@
 
 #include "lua.hpp"
 
+#include "../../Media/Manager/SFXManager.hpp"
+#include "../../Media/SFX.hpp"
 #include "Log/LogSystem.hpp"
-#include "../../Audio/Manager/SFXManager.hpp"
-#include "../../Audio/SFX.hpp"
 
 
 #define GET_SFX() (engine::audio::SFX::GetInstance())

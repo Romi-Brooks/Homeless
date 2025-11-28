@@ -18,21 +18,17 @@
 
 enum class NPCName;
 
-using NPCType = engine::config::npc_property::NPCType;
-using NPCKillable = engine::config::npc_property::NPCKillable;
-using NPCMovement = engine::config::movements::Movement;
-
 class NPC : public engine::entity::Entity{
 	protected:
 		// NPC Properties
 		NPCName name_;
 
 		// NPC Types
-		NPCType npcType_ {};
-		NPCKillable npcKillable_ {};
+		engine::config::npc_property::NPCType npcType_ {};
+		engine::config::npc_property::NPCKillable npcKillable_ {};
 
 	public:
-		NPC(const NPCName name, const NPCType type, const NPCKillable killable, const float hp, const float attack, const float moveSpeed, const float moveAcceleration)
+		NPC(const NPCName name, const engine::config::npc_property::NPCType type, const engine::config::npc_property::NPCKillable killable, const float hp, const float attack, const float moveSpeed, const float moveAcceleration)
 		: Entity(hp, attack, moveSpeed, moveAcceleration) {
 			name_ = name;
 			npcType_ = type;
@@ -42,24 +38,24 @@ class NPC : public engine::entity::Entity{
 			this->CreateCircleWithColor(15, sf::Color::Red);
 		};
 
-		auto Move(const NPCMovement Signal) const -> void override {
+		auto Move(const engine::config::movements::Movement Signal) const -> void override {
 			auto x = this->shape_->getPosition().x;
 			auto y = this->shape_->getPosition().y;
 
 			switch (Signal) {
-				case NPCMovement::Entity_MoveLeft: {
+				case engine::config::movements::Movement::Entity_MoveLeft: {
 					this->shape_->setPosition({x - (this->moveSpeed_ + this->moveAcceleration_), y});
 					break;
 				}
-				case NPCMovement::Entity_MoveRight: {
+				case engine::config::movements::Movement::Entity_MoveRight: {
 					this->shape_->setPosition({x + (this->moveSpeed_ + this->moveAcceleration_), y});
 					break;
 				}
-				case NPCMovement::Entity_MoveUp: {
+				case engine::config::movements::Movement::Entity_MoveUp: {
 					this->shape_->setPosition({x, y - (this->moveSpeed_ + this->moveAcceleration_)});
 					break;
 				}
-				case NPCMovement::Entity_MoveDown: {
+				case engine::config::movements::Movement::Entity_MoveDown: {
 					this->shape_->setPosition({x, y + (this->moveSpeed_ + this->moveAcceleration_)});
 					break;
 				}

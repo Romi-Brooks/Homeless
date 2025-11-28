@@ -10,7 +10,7 @@
 
 #include "lua.hpp"
 
-#include "../../Audio/Music.hpp"
+#include "../../Media/Music.hpp"
 #include "Log/LogSystem.hpp"
 
 // 获取Music单例（简化宏）

@@ -1,6 +1,10 @@
+// Standard Library
 #include <iostream>
+
+// Third party Library
 #include <utf8.h>
 
+// Self Dependencies
 #include "Unpackager.hpp"
 
 namespace fs = std::filesystem;

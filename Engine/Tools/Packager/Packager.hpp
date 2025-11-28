@@ -1,6 +1,7 @@
 #ifndef PACKAGER_HPP
 #define PACKAGER_HPP
 
+// Standard Library
 #include <string>
 #include <vector>
 #include <fstream>
@@ -8,6 +9,7 @@
 #include <unordered_map>
 
 namespace fs = std::filesystem;
+
 namespace engine::tools::package {
 	class Packager {
 		public:

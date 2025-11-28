@@ -8,7 +8,7 @@
 **/
 
 #include "../../../Config/Audios/SFX.hpp"
-#include <Audio/SFX.hpp>
+#include <Media/SFX.hpp>
 
 auto LoadSFX() -> void {
 	engine::audio::SFX::GetInstance().Load("native_kick", hl_sfx::native_kick_1);

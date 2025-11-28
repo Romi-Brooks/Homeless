@@ -1,3 +1,4 @@
+// Standard Library
 #include <iostream>
 #include <string>
 #include <vector>
@@ -10,11 +11,10 @@
 #include "windows.h"
 #endif // _WIN32
 
-// 引入你的打包/解包头文件
+// Self Dependencies
 #include "Packager.hpp"
 #include "Unpackager.hpp"
 
-// 命名空间别名
 namespace fs = std::filesystem;
 using engine::tools::package::Packager;
 using engine::tools::unpackage::Unpackager;
@@ -70,10 +70,10 @@ std::vector<std::string> ParseMultiDirectories(const std::string& input) {
     // 按逗号分割输入字符串
     while (std::getline(ss, dir, ',')) {
         // 去除目录名前后的空格：res1/, res2/
-        dir.erase(dir.begin(), std::find_if(dir.begin(), dir.end(), [](unsigned char c) {
+        dir.erase(dir.begin(), std::ranges::find_if(dir, [](const unsigned char c) {
             return !std::isspace(c);
         }));
-        dir.erase(std::find_if(dir.rbegin(), dir.rend(), [](unsigned char c) {
+        dir.erase(std::find_if(dir.rbegin(), dir.rend(), [](const unsigned char c) {
             return !std::isspace(c);
         }).base(), dir.end());
 
@@ -142,7 +142,7 @@ auto main() -> int {
         std::cout << "0. Exit" << std::endl;
         std::cout << "Input options (0-2):";
 
-        // 处理用户输入（防止非数字输入）
+        // 处理用户输入
         if (!(std::cin >> choice)) {
             ClearInputBuffer();
             std::cerr << "Error: Please enter a valid number (0-2)!" << std::endl;

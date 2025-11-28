@@ -17,7 +17,6 @@
 
 // Third party Library
 #include <SFML/Audio/Sound.hpp>
-#include <SFML/Audio/SoundBuffer.hpp>
 
 namespace engine::audio {
     class SFX final {

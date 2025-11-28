@@ -18,8 +18,6 @@
 #include "Entity.hpp"
 #include "../../Config/Movement/MoveEvent.hpp"
 
-using PlayerMovement = engine::config::movements::Movement;
-
 class Player final : public engine::entity::Entity {
 	private:
 		std::string name_;
@@ -60,24 +58,24 @@ class Player final : public engine::entity::Entity {
 		}
 
 
-		auto Move(const PlayerMovement Signal) const -> void override {
+		auto Move(const engine::config::movements::Movement Signal) const -> void override {
 			auto x = this->shape_->getPosition().x;
 			auto y = this->shape_->getPosition().y;
 
 			switch (Signal) {
-			case PlayerMovement::Entity_MoveLeft: {
+			case engine::config::movements::Movement::Entity_MoveLeft: {
 				this->shape_->setPosition({x - 3, y});
 				break;
 			}
-			case PlayerMovement::Entity_MoveRight: {
+			case engine::config::movements::Movement::Entity_MoveRight: {
 				this->shape_->setPosition({x + 3, y});
 				break;
 			}
-			case PlayerMovement::Entity_MoveUp: {
+			case engine::config::movements::Movement::Entity_MoveUp: {
 				this->shape_->setPosition({x, y - 3});
 				break;
 			}
-			case PlayerMovement::Entity_MoveDown: {
+			case engine::config::movements::Movement::Entity_MoveDown: {
 				this->shape_->setPosition({x, y + 3});
 				break;
 			}

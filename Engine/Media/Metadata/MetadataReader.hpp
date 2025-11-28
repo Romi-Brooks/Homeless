@@ -12,7 +12,7 @@
 
 #include <string>
 
-#include "../../Audio/Music.hpp"
+#include "../../Media/Music.hpp"
 
 namespace engine::audio::metadata {
 	class MetadataReader {

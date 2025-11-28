@@ -11,26 +11,25 @@
 #define HOMELESS_DEBUGGER_HPP
 
 #include <imgui.h>
-#include <imgui-SFML.h>
 
 #include <Windows/Manager/ScreenManager.hpp>
 #include <Windows/RenderWindow.hpp>
 #include <Windows/Screen.hpp>
 
-#include <Audio/Manager/VolumeManager.hpp>
-#include <Audio/Plug/MusicFade.hpp>
-#include <Audio/Music.hpp>
-#include <Audio/SFX.hpp>
+#include <Media/Manager/VolumeManager.hpp>
+#include <Media/Music.hpp>
+#include <Media/Plug/MusicFade.hpp>
+#include <Media/SFX.hpp>
 
 class Debugger : public engine::window::screen::Screen {
 	private:
-		// 音频资源映射：显示名 + 实际播放的资源名
+		// UI显示名 + 实际播放的资源名
 		struct AudioResource {
-			std::string display_name;  // 界面上显示的名称
+			std::string display_name;  // UI显示的名称
 			std::string resource_name; // 传给引擎的资源名
 		};
 
-		// 背景音乐列表（可按需扩展）
+		// 背景音乐列表
 		const std::vector<AudioResource> background_musics = {
 			{"Background 1", "native_background_1"},
 			{"Background 2", "native_background_2"},
@@ -38,7 +37,7 @@ class Debugger : public engine::window::screen::Screen {
 			{"Background 4", "lua_background_2"}
 		};
 
-		// SFX音效列表（可选，也可保留独立按钮）
+		// SFX音效列表
 		const std::vector<AudioResource> sfx_sounds = {
 			{"Kick", "native_kick"},
 			{"Snare", "native_snare"},
@@ -102,66 +101,71 @@ class Debugger : public engine::window::screen::Screen {
 			}
 
 			{
-		        ImGui::SeparatorText("Background Music (Fade Switch)");
-		        // 保存源音乐和目标音乐的选中状态
-		        static int selected_from_bg_index = 0; // 切换的源音乐索引
-		        static int selected_to_bg_index = 1;   // 切换的目标音乐索引（默认选第二首）
+			    ImGui::SeparatorText("Background Music (Fade Switch)");
 
-		        // 1. 源音乐下拉框
-		        const char* current_from_bg = background_musics[selected_from_bg_index].display_name.c_str();
-		        ImGui::Text("From:");
-		        ImGui::SameLine();
-		        if (ImGui::BeginCombo("##from_music", current_from_bg, ImGuiComboFlags_NoArrowButton)) {
-		            for (int i = 0; i < background_musics.size(); i++) {
-		                const bool is_selected = (selected_from_bg_index == i);
-		                if (ImGui::Selectable(background_musics[i].display_name.c_str(), is_selected)) {
-		                    selected_from_bg_index = i;
-		                }
-		                if (is_selected) {
-		                    ImGui::SetItemDefaultFocus();
-		                }
-		            }
-		            ImGui::EndCombo();
-		        }
+			    // 获取当前播放的音乐
+			    std::string current_playing = engine::audio::Music::GetInstance().GetNowPlaying();
 
-		        // 2. 目标音乐下拉框
-		        const char* current_to_bg = background_musics[selected_to_bg_index].display_name.c_str();
-		        ImGui::SameLine();
-		        ImGui::Text("To:");
-		        ImGui::SameLine();
-		        if (ImGui::BeginCombo("##to_music", current_to_bg, ImGuiComboFlags_NoArrowButton)) {
-		            for (int i = 0; i < background_musics.size(); i++) {
-		                const bool is_selected = (selected_to_bg_index == i);
-		                if (ImGui::Selectable(background_musics[i].display_name.c_str(), is_selected)) {
-		                    selected_to_bg_index = i;
-		                }
-		                if (is_selected) {
-		                    ImGui::SetItemDefaultFocus();
-		                }
-		            }
-		            ImGui::EndCombo();
-		        }
+			    // 显示当前播放的音乐
+			    if (!current_playing.empty()) {
+			        ImGui::Text("Now Playing: %s", current_playing.c_str());
+			    } else {
+			        ImGui::Text("Now Playing: None");
+			    }
 
-		        // 3. 切换按钮 + 同名校验
-		        ImGui::SameLine();
-		        bool is_same_music = (selected_from_bg_index == selected_to_bg_index);
-		        if (is_same_music) {
-		            // 选中同一首音乐时，按钮置灰并显示警告
-		            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
-		            ImGui::Button("Switch Background");
-		            ImGui::PopStyleColor();
-		            // 红色警告文本
-		            ImGui::SameLine();
-		            ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Same music selected!");
-		        } else {
-		            // 正常状态：点击按钮调用切换接口
-		            if (ImGui::Button("Switch Background")) {
-		                const auto& [from_display, from_resource] = background_musics[selected_from_bg_index];
-		                const auto& [to_display, to_resource] = background_musics[selected_to_bg_index];
-		                engine::audio::plug::MusicFade::GetInstance().Switch(from_resource, to_resource);
-		            }
-		        }
-		    }
+			    // 目标音乐下拉框
+			    static int selected_to_bg_index = 0;
+			    const char* current_to_bg = background_musics[selected_to_bg_index].display_name.c_str();
+
+			    ImGui::Text("Switch To:");
+			    ImGui::SameLine();
+			    if (ImGui::BeginCombo("##to_music", current_to_bg, ImGuiComboFlags_NoArrowButton)) {
+			        for (int i = 0; i < background_musics.size(); i++) {
+			            const bool is_selected = (selected_to_bg_index == i);
+			            if (ImGui::Selectable(background_musics[i].display_name.c_str(), is_selected)) {
+			                selected_to_bg_index = i;
+			            }
+			            if (is_selected) {
+			                ImGui::SetItemDefaultFocus();
+			            }
+			        }
+			        ImGui::EndCombo();
+			    }
+
+			    ImGui::SameLine();
+
+			    // 检查是否选择了当前正在播放的音乐
+			    bool is_same_music = false;
+			    if (!current_playing.empty()) {
+			        const auto& [to_display, to_resource] = background_musics[selected_to_bg_index];
+			        is_same_music = (current_playing == to_resource);
+			    }
+
+			    if (is_same_music) {
+			        // 选中同一首音乐时，按钮置灰并显示警告
+			        ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
+			        ImGui::Button("Switch");
+			        ImGui::PopStyleColor();
+			        // 红色警告文本
+			        ImGui::SameLine();
+			        ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Same music selected!");
+			    } else {
+			        if (ImGui::Button("Switch")) {
+			            const auto& [to_display, to_resource] = background_musics[selected_to_bg_index];
+			            // 指定目标音乐
+			            engine::audio::plug::MusicFade::GetInstance().Switch(to_resource, 2);
+			        }
+			    }
+
+			    // 添加一个直接播放按钮
+			    if (current_playing.empty()) {
+			        ImGui::SameLine();
+			        if (ImGui::Button("Play Directly")) {
+			            const auto& [to_display, to_resource] = background_musics[selected_to_bg_index];
+			            engine::audio::Music::GetInstance().Play(to_resource);
+			        }
+			    }
+			}
 
 			ImGui::End();
 		}
